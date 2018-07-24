@@ -62,7 +62,7 @@ module.exports = {
                                 }
                             }
 
-                            let url = originTime.split('/')[1] + originTime.split('/')[2].split(' ')[0] + originTime.split(' ')[1].split(':')[0] + originTime.split(' ')[1].split(':')[1] + String(magnitude).replace('.', '').substring(0, 2) + String(result.cwbopendata.dataset[0].earthquake[0].earthquakeNo).replace('107', '');
+                            let url = originTime.split('-')[1] + originTime.split('-')[2].split(' ')[0] + originTime.split(' ')[1].split(':')[0] + originTime.split(' ')[1].split(':')[1] + String(magnitude).replace('.', '').substring(0, 2) + String(result.cwbopendata.dataset[0].earthquake[0].earthquakeNo).replace('107', '');
 
                             DataBase.updateValue('Variables', 'EarthquakeLastKnowTime', { data: originTime });
 

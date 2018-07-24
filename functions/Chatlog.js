@@ -213,6 +213,7 @@ module.exports = {
      */
     showRank: function (id, messageType, rankCount) {
         return new Promise(async function (resolve, reject) {
+            rankCount = (0 < rankCount && rankCount < 100) ? rankCount : 10;
             (function restart(time) {
                 setTimeout(function () {
                     if (Chatlog) {

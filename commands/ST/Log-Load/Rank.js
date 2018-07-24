@@ -22,8 +22,7 @@ module.exports = {
             }
 
             let messages = event.message.text.split(' '), messageType = ["text", "image", "video", "audio", "file", "location", "sticker"];
-            let response = "以下是 " + (messageType.indexOf(messages[0]) > -1 ? messages[0] : 'text') + " 的訊息量排名：\n" + await Chatlog.showRank(event.source[event.source.type + 'Id'], (messageType.indexOf(messages[0]) > -1 ? messages[0] : 'text'), (Number(messages[1]) != NaN ? Number(messages[1]) : 10));
-            resolve(MsgFormat.Text(response));
+            resolve(MsgFormat.Text("以下是 " + (messageType.indexOf(messages[0]) > -1 ? messages[0] : 'text') + " 的訊息量排名：\n" + await Chatlog.showRank(event.source[event.source.type + 'Id'], (messageType.indexOf(messages[0]) > -1 ? messages[0] : 'text'), (Number(messages[1]) != NaN && messages[1] ? Number(messages[1]) : 10))));
         });
     }
 };
