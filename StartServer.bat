@@ -1,4 +1,3 @@
-cd..
 start /MIN ngrok http 8080
 :start
 cd suntaidev
