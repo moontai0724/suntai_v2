@@ -1,3 +1,4 @@
+// Own functions
 const MsgFormat = require('../../functions/MsgFormat.js');
 const CommandsList = require('../../functions/CommandsList.js');
 

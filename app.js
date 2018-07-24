@@ -15,10 +15,14 @@ const sqlite = require('sqlite');
 const ping = require('ping-net');
 
 // Own functions
+const Authorize = require('./functions/Authorize.js');
+const Chatlog = require('./functions/Chatlog.js');
+const CommandsList = require('./functions/CommandsList.js');
+const DataBase = require('./functions/DataBase.js');
+const Earthquake = require('./functions/Earthquake.js');
+const Imgur = require('./functions/Imgur.js');
 const MsgFormat = require('./functions/MsgFormat.js');
 const UTC8Time = require('./functions/UTC8Time.js');
-const Authorize = require('./functions/Authorize.js');
-const DataBase = require('./functions/DataBase.js');
 
 if (fs.existsSync('./config')) {
     if (!fs.existsSync('./config/config.json')) {
@@ -38,7 +42,7 @@ app.use(KoaBodyParser());
 
 // Webhook
 router.post('/', ctx => {
-    if (ctx.request.header['user-agent'].includes('LineBotWebhook')) {
+    if (ctx.request.header['user-agent'] && ctx.request.header['user-agent'].includes('LineBotWebhook')) {
         if (LineBotSDK.validateSignature(ctx.request.rawBody, Config.LineBot.channelSecret, ctx.request.headers['x-line-signature'])) {
             ctx.status = 200;
             ctx.request.body.events.map(MessageHandler);
@@ -52,7 +56,7 @@ router.post('/', ctx => {
                 }
             });
         }
-    } else if (ctx.request.header['user-agent'].includes('GitHub')) {
+    } else if (ctx.request.header['user-agent'] && ctx.request.header['user-agent'].includes('GitHub')) {
         if (ctx.request.header['x-hub-signature'] == 'sha1=' + crypto.createHmac('SHA1', Config.GitHub.webhookSecret).update(ctx.request.rawBody).digest('hex')) {
             ctx.status = 200;
             ctx.body = 'Server Restarted.';
@@ -73,6 +77,7 @@ router.post('/', ctx => {
     } else {
         ctx.status = 404;
         console.log('Received an unknown request!');
+        console.log(ctx.request);
         DataBase.readTable('OwnersNotice').then(ownersNotice => {
             for (let i = 0; i < ownersNotice.length; i++) {
                 LineBotClient.pushMessage(ownersNotice[i].id, MsgFormat.Text(UTC8Time.getTimeString() + '\nReceived an unknown request!'));
@@ -88,8 +93,10 @@ const server = app.listen(8080);
 
 // Handle messages
 async function MessageHandler(event) {
+    console.log(event, JSON.stringify(event));
     switch (event.type) {
         case 'message':
+            Chatlog.log(event);
             if (event.message.type == 'text') {
                 if (event.message.text.startsWith('/')) {
                     // Returned data(s) must formatted!
@@ -104,14 +111,38 @@ async function MessageHandler(event) {
                             return 0;
                         }
                     }
-                    require('./functions/CommandsList.js').check(event.message.text.replace('/', '').split(' ')).then(async function (data) {
+
+                    CommandsList.check(event.message.text.replace('/', '').split(' ')).then(async function (data) {
+                        console.log(data);
                         event.message.originalText = event.message.text;
                         event.data = data;
-                        event.message.text = event.message.text.replace(new RegExp('/' + data.parents + ' ' + data.name, "i"), '');
-                        if (event.message.text.startsWith(' ')) event.message.text = event.message.text.replace(' ', '');
-                        LineBotClient.replyMessage(event.replyToken, await data.data.MessageHandler(event).catch(err => {
-                            return MsgFormat.Text(err);
-                        }));
+                        event.message.text = event.message.text = event.message.text.split(' ').filter((value, index) => {
+                            return !((data.parents.split(' ')[index] ? (new RegExp((data.parents.split(' ')[index]), "i", "^", "$")).test(value) || (new RegExp(data.parents.split(' ')[index].replace(/[^A-Z]/g, ''), "i", "^", "$").test(value)) : false) || (new RegExp((data.name), "i", "^", "$")).test(value) || (new RegExp(data.name.replace(/[^A-Z]/g, ''), "i", "^", "$").test(value)));
+                        }).join(' ');
+
+                        data.data.MessageHandler(event).then(message => {
+                            if (message[0]) {
+                                let change = [];
+                                message.forEach(value => {
+                                    if (value.type == 'text' && value.text.length > 2000) {
+                                        let replyMsgArr = [];
+                                        for (let i = 0, o = 0; i < Math.ceil(value.text.length / 2000); ++i, o += 2000) replyMsgArr[i] = value.text.substr(o, 2000);
+                                        value.text = replyMsgArr[0];
+                                        for (let i = 1; i < replyMsgArr.length; i++) {
+                                            change[change.length] = { "text": replyMsgArr[i], "previousText": replyMsgArr[i - 1] };
+                                        }
+                                    }
+                                });
+                                change.forEach(data => message.splice(message.findIndex(value => value.text == data.previousText) + 1, 0, MsgFormat.Text(data.text)));
+                            } else if (message.type == 'text' && message.text.length > 2000) {
+                                let replyMsgArr = [];
+                                for (let i = 0, o = 0; i < Math.ceil(message.text.length / 2000); ++i, o += 2000) replyMsgArr[i] = message.text.substr(o, 2000);
+                                message = replyMsgArr.map(value => MsgFormat.Text(value));
+                            }
+
+                            if ((message[0] && message.length <= 5) || !message[0]) LineBotClient.replyMessage(event.replyToken, message);
+                            else LineBotClient.replyMessage(event.replyToken, MsgFormat.Text('訊息數量超過五則訊息限制而無法發送，請縮小執行動作的範圍，若認為是錯誤請告知開發者。'));
+                        }, err => LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(err)));
                     }, err => LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(err)));
                 }
             }
@@ -185,40 +216,43 @@ async function MessageHandler(event) {
     }
 }
 
-// Startup notice
-(async function () {
-    DataBase.readTable('OwnersNotice').then(ownersNotice => {
-        for (let i = 0; i < ownersNotice.length; i++) {
-            LineBotClient.pushMessage(ownersNotice[i].id, MsgFormat.Text(UTC8Time.getTimeString() + '\n日太已啟動完成。'));
-        }
-    });
-})();
+// // Startup notice
+// (async function () {
+//     DataBase.readTable('OwnersNotice').then(ownersNotice => {
+//         for (let i = 0; i < ownersNotice.length; i++) {
+//             LineBotClient.pushMessage(ownersNotice[i].id, MsgFormat.Text(UTC8Time.getTimeString() + '\n日太已啟動完成。'));
+//         }
+//     });
+// })();
 
-// Check ngrok connection every 30 minutes
-(function checkConnect(ms = 5000) {
-    setTimeout(function () {
-        ping.ping({ address: 'localhost', port: 4040, attempts: 2 }, pingResponse => {
-            if (pingResponse[0].avg) {
-                najax.get('http://127.0.0.1:4040/api/tunnels', ngrokInfo => {
-                    let url = JSON.parse(ngrokInfo).tunnels[0].public_url.split('://')[1].split('.')[0];
-                    DataBase.readTable('Variables', 'ngrokURL').then(data => {
-                        console.log(data);
-                        if (!data) {
-                            console.log('There is no ngrokURL data in database.');
-                            DataBase.insertValue('Variables', ['ngrokURL', url]).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/24784567'), MsgFormat.Text(url)]));
-                        } else if (data[0].data != url) {
-                            console.log('ngrokURL changed, write into database.');
-                            DataBase.updateValue('Variables', 'ngrokURL', { "data": url }).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/24784567'), MsgFormat.Text(url)]));
-                        } else {
-                            LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', MsgFormat.Text(UTC8Time.getTimeString() + '\n目前日太於 ' + url + ' 運作狀況良好。'));
-                        }
-                    });
-                });
-            } else {
-                console.log('There is no ngrok connection now!');
-                LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', MsgFormat.Text(UTC8Time.getTimeString() + '\n目前沒有 ngrok 連線。'));
-            }
-        });
-        UTC8Time.getTimePromise().then(time => checkConnect((((30 - time.minute % 30) * 60) - time.second) * 1000 - time.millisecond + 5000));
-    }, ms);
-})();
+// // Check ngrok connection every 30 minutes
+// (function checkConnect(ms = 5000) {
+//     setTimeout(function () {
+//         ping.ping({ address: 'localhost', port: 4040, attempts: 2 }, pingResponse => {
+//             if (pingResponse[0].avg) {
+//                 najax.get('http://127.0.0.1:4040/api/tunnels', ngrokInfo => {
+//                     let url = JSON.parse(ngrokInfo).tunnels[0].public_url.split('://')[1].split('.')[0];
+//                     DataBase.readTable('Variables', 'ngrokURL').then(data => {
+//                         console.log(data);
+//                         if (!data) {
+//                             console.log('There is no ngrokURL data in database.');
+//                             DataBase.insertValue('Variables', ['ngrokURL', url]).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/24784567'), MsgFormat.Text(url)]));
+//                         } else if (data[0].data != url) {
+//                             console.log('ngrokURL changed, write into database.');
+//                             DataBase.updateValue('Variables', 'ngrokURL', { "data": url }).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/24784567'), MsgFormat.Text(url)]));
+//                         } else {
+//                             LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', MsgFormat.Text(UTC8Time.getTimeString() + '\n目前日太於 ' + url + ' 運作狀況良好。'));
+//                         }
+//                     });
+//                 });
+//             } else {
+//                 console.log('There is no ngrok connection now!');
+//                 LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', MsgFormat.Text(UTC8Time.getTimeString() + '\n目前沒有 ngrok 連線。'));
+//             }
+//         });
+//         UTC8Time.getTimePromise().then(time => checkConnect((((30 - time.minute % 30) * 60) - time.second) * 1000 - time.millisecond + 5000));
+//     }, ms);
+// })();
+
+// // Earthquake check
+// Earthquake.opendata();

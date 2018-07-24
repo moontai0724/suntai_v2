@@ -1,18 +1,18 @@
 module.exports = {
     /**
      * Get time.
-     * @param {Number} [tms] Timestamp.
+     * @param {Number} [time] Timestamp or a string of time (YYYY/MM/DD HH:MM:SS).
      * @param {Number} [timezoneOffset] (Optional) Spicific a timezone.
      * @default +8
      * @returns {string} YYYY-MM-DD HH:MM:SS:MSS
      * @example 2018-06-30 00:00:00:000
      */
-    getTimeString: function (tms, timezoneOffset) {
-        return getTimeBase(0, tms, timezoneOffset);
+    getTimeString: function (time, timezoneOffset) {
+        return getTimeBase(0, time, timezoneOffset);
     },
     /**
      * Get time with promise handle.
-     * @param {Number} [tms] Timestamp.
+     * @param {Number} [time] Timestamp or a string of time (YYYY/MM/DD HH:MM:SS).
      * @param {Number} [timezoneOffset] (Optional) Spicific a timezone.
      * @default +8
      * @returns {JSON} A json format of time.
@@ -26,27 +26,29 @@ module.exports = {
      *    "millisecond": 000
      * }
      */
-    getTimePromise: function (tms, timezoneOffset) {
+    getTimePromise: function (time, timezoneOffset) {
         return new Promise(function (resolve) {
-            resolve(getTimeBase(1, tms, timezoneOffset));
+            resolve(getTimeBase(1, time, timezoneOffset));
         });
     },
     /**
      * Get now timestamp.
+     * @param {Number} [time] Timestamp or a string of time (YYYY/MM/DD HH:MM:SS).
      * @param {Number} [timezoneOffset] (Optional) Spicific a timezone.
      * @default +8
      * @returns {string} YYYY-MM-DD HH:MM:SS:MSS
      * @example 2018-06-30 00:00:00:000
      */
-    getTimestamp: function (timezoneOffset) {
-        return getTimeBase(2, undefined, timezoneOffset);
+    getTimestamp: function (time, timezoneOffset) {
+        console.log(time);
+        return getTimeBase(2, time, timezoneOffset);
     }
 };
 
-function getTimeBase(mode, tms, timezoneOffset) {
-    let time, millisecond, second, minute, hour, date, month, year;
-    if (tms && tms != undefined) {
-        time = new Date(Date.UTC((new Date(tms)).getUTCFullYear(), (new Date(tms)).getUTCMonth(), (new Date(tms)).getUTCDate(), (new Date(tms)).getUTCHours() + timezoneOffset != undefined ? timezoneOffset : 8, (new Date(tms)).getUTCMinutes(), (new Date(tms)).getUTCSeconds(), (new Date(tms)).getUTCMilliseconds()));
+function getTimeBase(mode, time, timezoneOffset) {
+    let millisecond, second, minute, hour, date, month, year;
+    if (time && time != undefined) {
+        time = new Date(Date.UTC((new Date(time)).getUTCFullYear(), (new Date(time)).getUTCMonth(), (new Date(time)).getUTCDate(), (new Date(time)).getUTCHours() + (timezoneOffset != undefined ? timezoneOffset : (mode == 2 ? 0 : 8)), (new Date(time)).getUTCMinutes(), (new Date(time)).getUTCSeconds(), (new Date(time)).getUTCMilliseconds()));
         millisecond = time.getUTCMilliseconds();
         second = time.getUTCSeconds();
         minute = time.getUTCMinutes();
@@ -55,7 +57,7 @@ function getTimeBase(mode, tms, timezoneOffset) {
         month = time.getUTCMonth() + 1; // 獲取到的時間是從 0 開始，因此 +1
         year = time.getUTCFullYear();
     } else {
-        time = new Date(Date.UTC((new Date()).getUTCFullYear(), (new Date()).getUTCMonth(), (new Date()).getUTCDate(), (new Date()).getUTCHours() + 8, (new Date()).getUTCMinutes(), (new Date()).getUTCSeconds(), (new Date()).getUTCMilliseconds()));
+        time = new Date(Date.UTC((new Date()).getUTCFullYear(), (new Date()).getUTCMonth(), (new Date()).getUTCDate(), (new Date()).getUTCHours() + (timezoneOffset != undefined ? timezoneOffset : (mode == 2 ? 0 : 8)), (new Date()).getUTCMinutes(), (new Date()).getUTCSeconds(), (new Date()).getUTCMilliseconds()));
         millisecond = time.getUTCMilliseconds();
         second = time.getUTCSeconds();
         minute = time.getUTCMinutes();

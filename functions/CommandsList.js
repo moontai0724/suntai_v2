@@ -4,6 +4,8 @@ var commands = { name: 'commands', type: 'floder', data: undefined };
 
 /**
  * Read full file list of a path, and require all file.
+ * When floder name include '-' character, means the string after '-' character is a default command that will execute when use command of floder name.
+ * @example Floder Name: ST-Help, command: /st. This will automatically redirected to /st help
  * @param {string} path A path which need to read.
  * @returns {JSON} Return a JSON format of full command list.
  */
@@ -14,30 +16,34 @@ function readPath(path = '') {
             if (!err) {
                 let response = {};
                 for (let i = 0; i < data.length; i++) {
-                    if (data[i].includes('.')) {
+                    if (data[i].includes('.') && !data[i].startsWith('-')) {
                         response[data[i].split('.')[0].toLowerCase()] = {
                             // Expected value: filename, like: Help
                             name: data[i].split('.')[0],
+                            // Default executed command
+                            default: data[i].includes('-') ? data[i].split('-')[1] : undefined,
                             // Expected value: lowercase filename, like: help
                             lowerCaseName: data[i].split('.')[0].toLowerCase(),
                             // Expected value: uppercase letter which transferred to lowercase letter in filename, like: h
                             shortName: data[i].split('.')[0].replace(/[^A-Z]/g, '').toLowerCase(),
                             // Parent commands
-                            parents: path.replace(/\//g, ' ').replace(' ', ''),
+                            parents: path.split("/").map(value => value.split('-')[0]).join(' ').replace(' ', ''),
                             // Expected value: js
                             type: data[i].split('.')[1].toLowerCase(),
                             data: require('.' + base + path + '/' + data[i])
                         };
-                    } else {
-                        response[data[i].toLowerCase()] = {
+                    } else if (!data[i].startsWith('-')) {
+                        response[data[i].split('-')[0].toLowerCase()] = {
                             // Expected value: dirname, like: MT
-                            name: data[i],
+                            name: data[i].split('-')[0],
+                            // Default executed command
+                            default: data[i].includes('-') ? data[i].split('-')[1] : undefined,
                             // Expected value: lowercase dirname, like: mt
-                            lowerCaseName: data[i].toLowerCase(),
+                            lowerCaseName: data[i].split('-')[0].toLowerCase(),
                             // Expected value: uppercase letter which transferred to lowercase letter in dirname, like: mt
-                            shortName: data[i].replace(/[^A-Z]/g, '').toLowerCase(),
+                            shortName: data[i].split('-')[0].replace(/[^A-Z]/g, '').toLowerCase(),
                             // Parent commands
-                            parents: path.replace(/\//g, ' ').replace(' ', ''),
+                            parents: path.split("/").map(value => value.split('-')[0]).join(' ').replace(' ', ''),
                             type: 'floder',
                             data: await readPath(path + '/' + data[i])
                         };
@@ -77,28 +83,44 @@ function getCommandsInfo(path = '') {
  */
 function filterCommands(msgs, parentDirList, commandSequence, previousCommand) {
     return new Promise(async function (resolve, reject) {
+        if (previousCommand.startsWith(' ')) previousCommand = previousCommand.replace(' ', '');
+
         // If no command after a floder command.
-        if (msgs[commandSequence] == undefined) reject('404 Command Not Found, 傳送 "/' + previousCommand + ' help" 獲得指令幫助。');
+        if (msgs[commandSequence] == undefined) {
+            if (parentDirList.default != undefined) {
+                msgs[commandSequence] = parentDirList.default;
+            } else {
+                reject('傳送了一個指令集合，請傳送 "/' + previousCommand + ' help" 獲得指令幫助。');
+                return 0;
+            }
+        }
 
         let nowCommand = msgs[commandSequence].toLowerCase();
-        previousCommand = previousCommand + ' ' + nowCommand;
-        if (previousCommand.startsWith(' ')) previousCommand = previousCommand.replace(' ', '');
         if (parentDirList.data[nowCommand] && parentDirList.data[nowCommand].type == 'js') {
-            resolve(previousCommand);
+            resolve(previousCommand + ' ' + parentDirList.data[nowCommand].name);
         } else if (parentDirList.data[nowCommand] && parentDirList.data[nowCommand].type == 'floder') {
-            resolve(await filterCommands(msgs, parentDirList.data[nowCommand], ++commandSequence, previousCommand).catch(err => reject(err)));
+            resolve(await filterCommands(msgs, parentDirList.data[nowCommand], ++commandSequence, previousCommand + ' ' + parentDirList.data[nowCommand].name).catch(err => reject(err)));
         } else {
             // short command
             for (let key in parentDirList.data) {
                 if (parentDirList.data[key].shortName == nowCommand) {
                     if (parentDirList.data[key].type == 'js') {
-                        resolve(previousCommand);
+                        resolve(previousCommand + ' ' + parentDirList.data[key].name);
+                        return 0;
                     } else if (parentDirList.data[key].type == 'floder') {
-                        resolve(await filterCommands(msgs, parentDirList.data[key], ++commandSequence, previousCommand).catch(err => reject(err)));
+                        resolve(await filterCommands(msgs, parentDirList.data[key], ++commandSequence, previousCommand + ' ' + parentDirList.data[key].name).catch(err => reject(err)));
+                        return 0;
                     }
                 }
             }
-            reject('404 Command Not Found: /' + previousCommand);
+
+            if (parentDirList.default != undefined) {
+                msgs.splice(commandSequence, 1, parentDirList.default);
+                resolve(await filterCommands(msgs, parentDirList, commandSequence, previousCommand).catch(err => reject(err)));
+                return 0;
+            } else {
+                reject('404 Command Not Found: /' + previousCommand + ' ' + msgs[commandSequence]);
+            }
         }
     });
 }
@@ -115,7 +137,7 @@ function filterCommands(msgs, parentDirList, commandSequence, previousCommand) {
 function getCommandsData(commandsString, parentDirList, commandSequence) {
     return new Promise(async function (resolve, reject) {
         console.log('getCommandsData');
-        let commandsArray = commandsString.split(' ');
+        let commandsArray = commandsString.toLowerCase().split(' ');
         if (commandSequence == commandsArray.length - 1) {
             resolve(parentDirList.data[commandsArray[commandSequence]]);
         } else {
@@ -151,7 +173,7 @@ function getChildCommands(parentDirList, onlyParent, commandsString) {
             for (let key in parentDirList.data) {
                 if (parentDirList.data[key].type == 'floder') {
                     // Description in help file is required!!
-                    response += await getChildCommands(parentDirList.data[key].data, onlyParent, commandsString + ' ' + key);
+                    response += await getChildCommands(parentDirList.data[key], onlyParent, commandsString + ' ' + parentDirList.data[key].name);
                 } else if (parentDirList.data[key].type == 'js') {
                     // Description in js file is required!!
                     response += '\n/' + commandsString + ' ' + parentDirList.data[key].name + ': ' + parentDirList.data[key].data.description;
@@ -207,6 +229,7 @@ module.exports = {
         return new Promise(async function (resolve, reject) {
             if (!msgs) reject('Parameter lost.');
             let targetCommands = await filterCommands(msgs, await getCommandsInfo().catch(err => reject(err)), 0, '').catch(err => reject(err));
+            console.log(targetCommands);
             resolve(await getCommandsData(targetCommands, await getCommandsInfo().catch(err => reject(err)), 0).catch(err => reject(err)));
         });
     }

@@ -12,6 +12,7 @@ setTimeout(async function () {
 module.exports = {
     /**
      * Read an entire table or a specific row in a table from database.
+     * @requires sqlite A module to use sqlite.
      * @param {string} tableName Table name in database, like: Groups, Owners, Users... etc.
      * @param {string} [id] (Optional) Specific id in a table, such like a groupId.
      * @returns {Promise<Array<JSON>>} An array of JSON format list of specific data, or returns a promise rejection with error.
@@ -22,7 +23,7 @@ module.exports = {
             if (/\s/.test(id)) reject('id have whitespace(s).');
             try {
                 console.log('SELECT * FROM ' + tableName + (id ? ' WHERE id="' + id + '"' : ''));
-                setTimeout(() => db_settings.all('SELECT * FROM ' + tableName + (id ? ' WHERE id="' + id + '"' : '')).then(data => resolve(data)).catch(error => reject(error)), db_settings ? 0 : 2000);
+                setTimeout(() => db_settings.all('SELECT * FROM ' + tableName + (id ? ' WHERE id="' + id + '"' : '')).then(resolve, reject), db_settings ? 0 : 2000);
             } catch (error) {
                 // When database is not ready for I/O.
                 reject(error);
@@ -31,6 +32,7 @@ module.exports = {
     },
     /**
      * Insert value(s) into a table.
+     * @requires sqlite A module to use sqlite.
      * @param {string} tableName Table name in database, like: Groups, Owners, Users... etc.
      * @param {string | Array<string>} value Value(s) to be update, can be an array or a string.
      * @example "Value To Insert" || ["Value1", "Value2", "Value3"]
@@ -41,8 +43,7 @@ module.exports = {
             if (/\s/.test(tableName)) reject('tableName have whitespace(s).');
             let valueToInsert = "";
             if (typeof (value) == 'object') {
-                valueToInsert = value[0];
-                for (let i = 1; i < value.length; i++) valueToInsert += '", ' + value[i];
+                valueToInsert = value.join('", "');
             } else {
                 if (value.includes('"')) value = value.replace('"', '');
                 // if (value.includes(',')) {
@@ -55,7 +56,7 @@ module.exports = {
             // Start insert values.
             try {
                 console.log('INSERT INTO ' + tableName + ' VALUES ("' + valueToInsert + '")');
-                setTimeout(() => db_settings.run('INSERT INTO ' + tableName + ' VALUES ("' + valueToInsert + '")').catch(error => error ? reject(error) : resolve(true)), db_settings ? 0 : 2000);
+                setTimeout(() => db_settings.run('INSERT INTO ' + tableName + ' VALUES ("' + valueToInsert + '")').then(resolve, reject), db_settings ? 0 : 2000);
             } catch (error) {
                 // When database is not ready for I/O.
                 reject(error);
@@ -64,6 +65,7 @@ module.exports = {
     },
     /**
      * Update value(s) in a table.
+     * @requires sqlite A module to use sqlite.
      * @param {string} tableName Table name in database, like: Groups, Owners, Users... etc.
      * @param {string} id Specific id in a table, such like a groupId.
      * @param {JSON} formattedData If there have a data in JSON format, put it here; else, leave it empty ("").
@@ -122,7 +124,7 @@ module.exports = {
             }
             try {
                 console.log('UPDATE ' + tableName + ' SET ' + valueToUpdate + ' WHERE id="' + id + '"');
-                setTimeout(() => db_settings.run('UPDATE ' + tableName + ' SET ' + valueToUpdate + ' WHERE id="' + id + '"').catch(error => error ? reject(error) : resolve(true)), db_settings ? 0 : 2000);
+                setTimeout(() => db_settings.run('UPDATE ' + tableName + ' SET ' + valueToUpdate + ' WHERE id="' + id + '"').then(resolve, reject), db_settings ? 0 : 2000);
             } catch (error) {
                 // When database is not ready for I/O.
                 reject(error);
@@ -131,6 +133,7 @@ module.exports = {
     },
     /**
      * Remove a specific row in a table from database.
+     * @requires sqlite A module to use sqlite.
      * @param {string} tableName Table name in database, like: Groups, Owners, Users... etc.
      * @param {string} id Specific id in a table, such like a groupId.
      * @returns {Promise<boolean>} Promise resolve with a parameter of true, or returns a promise rejection with error.
@@ -141,7 +144,7 @@ module.exports = {
             if (/\s/.test(id)) reject('id have whitespace(s).');
             try {
                 console.log('DELETE FROM ' + tableName + ' WHERE id="' + id + '"');
-                setTimeout(() => db_settings.run('DELETE FROM ' + tableName + ' WHERE id="' + id + '"').catch(error => error ? reject(error) : resolve(true)), db_settings ? 0 : 2000);
+                setTimeout(() => db_settings.run('DELETE FROM ' + tableName + ' WHERE id="' + id + '"').then(resolve, reject), db_settings ? 0 : 2000);
             } catch (error) {
                 reject(error);
             }
