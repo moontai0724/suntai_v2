@@ -76,7 +76,7 @@ module.exports = {
                                 '\n查看網頁（地震測報中心）： ' + weburl;
                             console.log(allmsg);
 
-                            DataBase.readTable(EarthquakeNotification).then(earthquake_notification_list => {
+                            DataBase.readTable('EarthquakeNotification').then(earthquake_notification_list => {
                                 let NoticeList = [];
                                 for (let x = 0; x < earthquake_notification_list.length; x++) {
                                     for (let y = 0; y < shakingArea.length; y++) {
