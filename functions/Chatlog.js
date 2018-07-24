@@ -219,7 +219,7 @@ module.exports = {
                         Chatlog.all('SELECT * FROM ' + id).then(data => {
                             let result = [];
                             data.forEach((value, index) => {
-                                let exist = result.findIndex(element => { return element.userId == value.id });
+                                let exist = result.findIndex(element => { return element.userId == value.userId });
                                 exist = exist > -1 ? exist : result.length;
                                 result[exist] = result[exist] ? result[exist] : {
                                     "userId": "UNKNOWN",
@@ -232,7 +232,7 @@ module.exports = {
                                     "location": 0,
                                     "sticker": 0
                                 };
-                                result[exist].userId = value.id;
+                                result[exist].userId = value.userId;
                                 result[exist].displayName = decodeURIComponent(value.displayName);
                                 result[exist][value.messageType] += 1;
                             });
