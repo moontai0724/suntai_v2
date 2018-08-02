@@ -98,12 +98,13 @@ module.exports = {
                                         }
                                     }
                                 }
+
                                 for (let i = 0; i < NoticeList.length; i++) {
                                     LineBotClient.pushMessage(NoticeList[i].id, MsgFormat.Text(allmsg + NoticeList[i].area));
                                 }
                                 Imgur.uploadByUrl(reportimg, allmsg).then(pic_link => {
                                     for (let i = 0; i < NoticeList.length; i++) {
-                                        LineBotClient.pushMessage(NoticeList[i].id, MsgFormat.Image(pic_link, pic_link)); s
+                                        LineBotClient.pushMessage(NoticeList[i].id, MsgFormat.Image(pic_link, pic_link));
                                     }
                                 });
                             });
