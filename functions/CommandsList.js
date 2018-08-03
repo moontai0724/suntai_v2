@@ -119,7 +119,7 @@ function filterCommands(msgs, parentDirList, commandSequence, previousCommand) {
                 resolve(await filterCommands(msgs, parentDirList, commandSequence, previousCommand).catch(err => reject(err)));
                 return 0;
             } else {
-                reject('404 Command Not Found: /' + previousCommand ? (previousCommand + ' ') : '' + msgs[commandSequence]);
+                reject('404 Command Not Found: /' + (previousCommand ? (previousCommand + ' ') : '') + msgs[commandSequence]);
             }
         }
     });

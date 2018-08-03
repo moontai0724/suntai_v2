@@ -247,7 +247,7 @@ module.exports = {
                                     }
                                 }
                             }
-                            resolve(result.map((value, index) => (index + 1) + ". " + value.displayName + ": " + value[messageType]).splice(0, rankCount).join("\n"));
+                            resolve(result.filter(value => (value.userId != UNKNOWN && value[messageType] != 0)).map((value, index) => ((index + 1) + ". " + value.displayName + ": " + value[messageType])).splice(0, rankCount).join("\n"));
                         });
                     } else restart(1000);
                 }, time);
