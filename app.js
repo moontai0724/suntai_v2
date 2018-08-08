@@ -95,9 +95,9 @@ const server = app.listen(8080);
 async function MessageHandler(event) {
     switch (event.type) {
         case 'message':
-            Chatlog.log(event);
+            setTimeout(() => Chatlog.log(event), 500);
             if (event.message.type == 'text') {
-                if (event.message.text.startsWith('/')) {
+                if (event.message.text.startsWith('/') && !event.message.text.startsWith('//')) {
                     // Returned data(s) must formatted!
                     if (event.message.text.toLowerCase().startsWith('/mt')) {
                         try {
