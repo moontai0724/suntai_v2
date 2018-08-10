@@ -1,11 +1,11 @@
 const fs = require('fs');
 
-var commands = { name: 'commands', type: 'floder', data: undefined };
+var commands = { name: 'commands', type: 'folder', data: undefined };
 
 /**
  * Read full file list of a path, and require all file.
- * When floder name include '-' character, means the string after '-' character is a default command that will execute when use command of floder name.
- * @example Floder Name: ST-Help, command: /st. This will automatically redirected to /st help
+ * When folder name include '-' character, means the string after '-' character is a default command that will execute when use command of folder name.
+ * @example Folder Name: ST-Help, command: /st. This will automatically redirected to /st help
  * @param {string} path A path which need to read.
  * @returns {JSON} Return a JSON format of full command list.
  */
@@ -44,7 +44,7 @@ function readPath(path = '') {
                             shortName: data[i].split('-')[0].replace(/[^A-Z]/g, '').toLowerCase(),
                             // Parent commands
                             parents: path.split("/").map(value => value.split('-')[0]).join(' ').replace(' ', ''),
-                            type: 'floder',
+                            type: 'folder',
                             data: await readPath(path + '/' + data[i])
                         };
                     }
@@ -85,7 +85,7 @@ function filterCommands(msgs, parentDirList, commandSequence, previousCommand) {
     return new Promise(async function (resolve, reject) {
         if (previousCommand.startsWith(' ')) previousCommand = previousCommand.replace(' ', '');
 
-        // If no command after a floder command.
+        // If no command after a folder command.
         if (msgs[commandSequence] == undefined) {
             if (parentDirList.default != undefined) {
                 msgs[commandSequence] = parentDirList.default;
@@ -98,7 +98,7 @@ function filterCommands(msgs, parentDirList, commandSequence, previousCommand) {
         let nowCommand = msgs[commandSequence].toLowerCase();
         if (parentDirList.data[nowCommand] && parentDirList.data[nowCommand].type == 'js') {
             resolve(previousCommand + ' ' + parentDirList.data[nowCommand].name);
-        } else if (parentDirList.data[nowCommand] && parentDirList.data[nowCommand].type == 'floder') {
+        } else if (parentDirList.data[nowCommand] && parentDirList.data[nowCommand].type == 'folder') {
             resolve(await filterCommands(msgs, parentDirList.data[nowCommand], ++commandSequence, previousCommand + ' ' + parentDirList.data[nowCommand].name).catch(err => reject(err)));
         } else {
             // short command
@@ -107,7 +107,7 @@ function filterCommands(msgs, parentDirList, commandSequence, previousCommand) {
                     if (parentDirList.data[key].type == 'js') {
                         resolve(previousCommand + ' ' + parentDirList.data[key].name);
                         return 0;
-                    } else if (parentDirList.data[key].type == 'floder') {
+                    } else if (parentDirList.data[key].type == 'folder') {
                         resolve(await filterCommands(msgs, parentDirList.data[key], ++commandSequence, previousCommand + ' ' + parentDirList.data[key].name).catch(err => reject(err)));
                         return 0;
                     }
@@ -130,7 +130,7 @@ function filterCommands(msgs, parentDirList, commandSequence, previousCommand) {
  * @param {String} commandsString commands to the dir.
  * @example st help
  * @param {JSON} parentDirList parent command dir
- * @example { name: 'st', type: 'floder', data: (JSON object) }
+ * @example { name: 'st', type: 'folder', data: (JSON object) }
  * @param {Number} commandSequence Which command is handling now?
  * @returns {string} A required data of command js file.
  */
@@ -147,9 +147,9 @@ function getCommandsData(commandsString, parentDirList, commandSequence) {
 }
 
 /**
- * A command to get a list of commands in a floder, but only 1 dir.
+ * A command to get a list of commands in a folder, but only 1 dir.
  * @param {JSON} parentDirList Parent command dir.
- * @example { name: 'st', type: 'floder', data: (JSON object) }
+ * @example { name: 'st', type: 'folder', data: (JSON object) }
  * @param {Boolean} onlyParent Only read parent dir or not.
  * @param {String} commandsString Commands to the dir.
  * @example st help
@@ -161,7 +161,7 @@ function getChildCommands(parentDirList, onlyParent, commandsString) {
         if (onlyParent) {
             response = '以下是 "/' + commandsString + '" 的指令幫助與說明：\n指令不分大小寫，但幫助文件中的大寫字母代表該指令的簡易指令，例：/st h 相等於 /st help';
             for (let key in parentDirList.data) {
-                if (parentDirList.data[key].type == 'floder') {
+                if (parentDirList.data[key].type == 'folder') {
                     // Description in help file is required!!
                     response += '\n' + parentDirList.data[key].name + ': ' + parentDirList.data[key].data.help.data.description + ' 使用 "/' + commandsString + ' ' + parentDirList.data[key].name + ' help" 來獲取指令幫助。';
                 } else if (parentDirList.data[key].type == 'js') {
@@ -171,7 +171,7 @@ function getChildCommands(parentDirList, onlyParent, commandsString) {
             }
         } else {
             for (let key in parentDirList.data) {
-                if (parentDirList.data[key].type == 'floder') {
+                if (parentDirList.data[key].type == 'folder') {
                     // Description in help file is required!!
                     response += await getChildCommands(parentDirList.data[key], onlyParent, commandsString + ' ' + parentDirList.data[key].name);
                 } else if (parentDirList.data[key].type == 'js') {
@@ -190,9 +190,9 @@ module.exports = {
      * Get a full list of commands and require each file.
      * Notice:
      *   1. Please notice that a file name should not include dot(s) or space(s)!
-     *   2. An extension name of a file should not be 'floder'.
+     *   2. An extension name of a file should not be 'folder'.
      *   3. A filename includes uppercase letter(s) will be a simplify command of it.
-     *   4. Each floder must have a Help.js file and a description module.export!
+     *   4. Each folder must have a Help.js file and a description module.export!
      * @returns {JSON} A JSON format commands list.
      */
     get: function () {
@@ -201,9 +201,9 @@ module.exports = {
         });
     },
     /**
-     * Get a list of child commands in a floder.
+     * Get a list of child commands in a folder.
      * @param {Array<string>} msgs A full array of which user send.
-     * @param {boolean} [onlyParent] If only want to get help of a floder without child floder.
+     * @param {boolean} [onlyParent] If only want to get help of a folder without child folder.
      * @param {string} [targetCommands] A string of valid parent command.
      * @example ['st', 'help']
      * @returns {String} A string of commands description of the specific command.
