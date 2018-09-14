@@ -149,5 +149,43 @@ module.exports = {
                 reject(error);
             }
         });
+    },
+    /**
+     * Create a table with sql command.
+     * @requires sqlite A module to use sqlite.
+     * @param {string} tableName Table name in database, like: Groups, Owners, Users... etc.
+     * @param {string} [sql] sql command to create column(s) without id column.
+     * @default sql CREATE TABLE tableName ("id" TEXT UNIQUE, PRIMARY KEY("id"))
+     * @example datatype: NULL, INTEGER, REAL, TEXT, BLOB
+     * @example NOT NULL, UNIQUE, DEFAULT(), CHECK()
+     */
+    createTable: function (tableName, sql = "") {
+        return new Promise((resolve, reject) => {
+            if (/\s/.test(tableName)) reject('tableName have whitespace(s).');
+            try {
+                setTimeout(() => db_settings.run('CREATE TABLE "' + tableName + '" ("id" TEXT UNIQUE,' + sql + ' PRIMARY KEY("id"))').then(resolve, reject), db_settings ? 0 : 2000);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    },
+    /**
+     * Check if a table already exist or not.
+     * @requires sqlite A module to use sqlite.
+     * @param {string} tableName The table name to check.
+     * @returns {Promise<Boolean>} If the table already exists, returns true; else, return false. Or returns a promise rejection with error.
+     */
+    checkTable: function (tableName) {
+        return new Promise((resolve, reject) => {
+            if (/\s/.test(tableName)) reject('tableName have whitespace(s).');
+            try {
+                setTimeout(() => db_settings.run('SELECT * FROM sqlite_master').then(tables => {
+                    if (tables.findIndex(value => value.id == tableName) > -1) resolve(true);
+                    else resolve(false);
+                }, reject), db_settings ? 0 : 2000);
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 }

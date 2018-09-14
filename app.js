@@ -154,8 +154,8 @@ async function MessageHandler(event) {
             switch (event.source.type) {
                 case 'group':
                     DataBase.readTable('Groups').then(groups => {
-                        if (groups.indexOf(event.source.groupId) == -1) DataBase.insertValue('Groups', event.source.groupId);
-                        else console.log('Groups ' + event.source.roomId + ' is not in database.');
+                        if (groups.findIndex(value => value.id == event.source.groupId) == -1) DataBase.insertValue('Groups', event.source.groupId);
+                        else console.log('Groups ' + event.source.roomId + ' is already in database.');
                     });
                     DataBase.readTable('OwnersNotice').then(ownersNotice => {
                         for (let i = 0; i < ownersNotice.length; i++) {
@@ -165,8 +165,8 @@ async function MessageHandler(event) {
                     break;
                 case 'room':
                     DataBase.readTable('Rooms').then(rooms => {
-                        if (rooms.indexOf(event.source.roomId) == -1) DataBase.insertValue('Rooms', event.source.roomId);
-                        else console.log('Room ' + event.source.roomId + ' is not in database.');
+                        if (rooms.findIndex(value => value.id == event.source.roomId) == -1) DataBase.insertValue('Rooms', event.source.roomId);
+                        else console.log('Room ' + event.source.roomId + ' is already in database.');
                     });
                     DataBase.readTable('OwnersNotice').then(ownersNotice => {
                         for (let i = 0; i < ownersNotice.length; i++) {
@@ -190,7 +190,7 @@ async function MessageHandler(event) {
             switch (event.source.type) {
                 case 'group':
                     DataBase.readTable('Groups').then(groups => {
-                        if (groups.indexOf(event.source.groupId) > -1) DataBase.deleteWithId('Groups', event.source.groupId);
+                        if (groups.findIndex(value => value.id == event.source.groupId) > -1) DataBase.deleteWithId('Groups', event.source.groupId);
                         else console.log('Groups ' + event.source.roomId + ' is not in database.');
                     });
                     DataBase.readTable('OwnersNotice').then(ownersNotice => {
@@ -201,7 +201,7 @@ async function MessageHandler(event) {
                     break;
                 case 'room':
                     DataBase.readTable('Rooms').then(rooms => {
-                        if (rooms.indexOf(event.source.roomId) > -1) DataBase.deleteWithId('Rooms', event.source.roomId);
+                        if (rooms.findIndex(value => value.id == event.source.roomId) > -1) DataBase.deleteWithId('Rooms', event.source.roomId);
                         else console.log('Room ' + event.source.roomId + ' is not in database.');
                     });
                     DataBase.readTable('OwnersNotice').then(ownersNotice => {
