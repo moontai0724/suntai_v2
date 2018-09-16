@@ -181,7 +181,7 @@ module.exports = {
             if (/\s/.test(tableName)) reject('tableName have whitespace(s).');
             try {
                 setTimeout(() => db_settings.all('SELECT * FROM sqlite_master').then(tables => {
-                    if (tables.findIndex(value => value.id == tableName) > -1) resolve(true);
+                    if (tables.findIndex(value => value.tbl_name == tableName) > -1) resolve(true);
                     else resolve(false);
                 }, reject), db_settings ? 0 : 2000);
             } catch (error) {
