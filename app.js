@@ -128,9 +128,8 @@ async function MessageHandler(event) {
                     DataBase.readTable('Keyword').then(keyword => {
                         keyword.forEach(value => {
                             value.keyword = decodeURIComponent(value.keyword);
-                            console.log((new RegExp((value.method == 'FullCompare' ? '^(' : '') + value.keyword + (value.method == 'FullCompare' ? ')?$' : ''))));
-                            if ((new RegExp((value.method == 'FullCompare' ? '^(' : '') + value.keyword + (value.method == 'FullCompare' ? ')?$' : ''))).test(event.message.text)) {
-                                switch (value.type) {
+                            if ((new RegExp((value.method == 'FullCompare' ? '^' : '') + value.keyword + (value.method == 'FullCompare' ? '$' : ''))).test(event.message.text)) {
+                                switch (value.dataType) {
                                     case 'text':
                                         LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(value.data));
                                         break;
