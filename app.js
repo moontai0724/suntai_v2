@@ -237,10 +237,10 @@ async function MessageHandler(event) {
                         console.log(data);
                         if (!data) {
                             console.log('There is no ngrokURL data in database.');
-                            DataBase.insertValue('Variables', ['ngrokURL', url]).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/24784567'), MsgFormat.Text(url)]));
+                            DataBase.insertValue('Variables', ['ngrokURL', url]).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/39849029'), MsgFormat.Text(url)]));
                         } else if (data[0].data != url) {
                             console.log('ngrokURL changed, write into database.');
-                            DataBase.updateValue('Variables', 'ngrokURL', { "data": url }).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/24784567'), MsgFormat.Text(url)]));
+                            DataBase.updateValue('Variables', 'ngrokURL', { "data": url }).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/39849029'), MsgFormat.Text(url)]));
                         } else {
                             LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', MsgFormat.Text(UTC8Time.getTimeString() + '\n目前日太於 ' + url + ' 運作狀況良好。'));
                         }
