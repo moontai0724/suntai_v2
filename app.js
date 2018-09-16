@@ -124,7 +124,7 @@ async function MessageHandler(event) {
                             else LineBotClient.replyMessage(event.replyToken, MsgFormat.Text('訊息數量超過五則訊息限制而無法發送，請縮小執行動作的範圍，若認為是錯誤請告知開發者。'));
                         }, err => LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(err)));
                     }, err => LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(err)));
-                } else {
+                } else if (databaseReady) {
                     DataBase.readTable('Keyword').then(keyword => {
                         keyword.forEach(value => {
                             value.keyword = decodeURIComponent(value.keyword);
@@ -259,7 +259,7 @@ async function MessageHandler(event) {
 var databaseReady = false;
 DataBase.checkTable('Keyword').then(exist => {
     if (exist) databaseReady = true;
-    else DataBase.createTable('Keyword', '"author" TEXT NOT NULL, "method" TEXT NOT NULL, "keyword" TEXT NOT NULL, "dataType" TEXT NOT NULL, "data" TEXT NOT NULL');
+    else DataBase.createTable('Keyword', '"author" TEXT NOT NULL, "method" TEXT NOT NULL, "keyword" TEXT NOT NULL, "dataType" TEXT NOT NULL, "data" TEXT NOT NULL').then(() => (databaseReady = true, console.log('Create Keyword database success!')), console.log);
 });
 
 // Earthquake check

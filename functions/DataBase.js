@@ -179,7 +179,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             if (/\s/.test(tableName)) reject('tableName have whitespace(s).');
             try {
-                setTimeout(() => db_settings.run('SELECT * FROM sqlite_master').then(tables => {
+                setTimeout(() => db_settings.all('SELECT * FROM sqlite_master').then(tables => {
                     if (tables.findIndex(value => value.id == tableName) > -1) resolve(true);
                     else resolve(false);
                 }, reject), db_settings ? 0 : 2000);
