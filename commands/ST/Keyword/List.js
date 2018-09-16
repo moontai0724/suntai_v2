@@ -8,7 +8,7 @@ module.exports = {
     MessageHandler: function (event) {
         return new Promise(async function (resolve, reject) {
             DataBase.readTable('Keyword').then(keyword => {
-                Pastebin.post(keyword.map(value => "{\n\tid: " + value.id + ",\n\tmethod: " + value.method + ",\n\tkeyword: " + decodeURIComponent(value.keyword) + ",\n\tdataType: " + value.dataType + ",\n\tdata: " + decodeURIComponent(value.data) + "\n}").join('\n'), false, 1, "10M", "SunTai Keyword Response List (" + (new Date()).toLocaleString("zh-tw", { hour12: false }) + ")").then(url => resolve(MsgFormat.Text('關鍵字回應詳細清單如下：' + url)), reject)
+                Pastebin.post(keyword.map(value => "{\n\tid: " + value.id + ",\n\tauthor: " + value.author + ",\n\tplace: " + value.place + ",\n\tmethod: " + value.method + ",\n\tkeyword: " + decodeURIComponent(value.keyword) + ",\n\tdataType: " + value.dataType + ",\n\tdata: " + decodeURIComponent(value.data) + "\n}").join('\n'), false, 1, "10M", "SunTai Keyword Response List (" + (new Date()).toLocaleString("zh-tw", { hour12: false }) + ")").then(url => resolve(MsgFormat.Text('關鍵字回應詳細清單如下：' + url)), reject)
             }, reject);
         });
     }

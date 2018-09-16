@@ -11,6 +11,57 @@ setTimeout(async function () {
 
 module.exports = {
     /**
+     * Enter sql by yourself!
+     * @requires sqlite A module to use sqlite.
+     * @param {string} sql sql command.
+     * @returns {Promise<Array<JSON>>} An array of JSON format list of specific data, or returns a promise rejection with error.
+     */
+    all: function (sql) {
+        return new Promise((resolve, reject) => {
+            try {
+                console.log('SQLITE All: ' + sql);
+                setTimeout(() => db_settings.all(sql).then(resolve, reject), db_settings ? 0 : 2000);
+            } catch (error) {
+                // When database is not ready for I/O.
+                reject(error);
+            }
+        });
+    },
+    /**
+     * Enter sql by yourself!
+     * @requires sqlite A module to use sqlite.
+     * @param {string} sql sql command.
+     * @returns {Promise<Array<JSON>>} An JSON format of specific data, or returns a promise rejection with error.
+     */
+    get: function (sql) {
+        return new Promise((resolve, reject) => {
+            try {
+                console.log('SQLITE Get: ' + sql);
+                setTimeout(() => db_settings.get(sql).then(resolve, reject), db_settings ? 0 : 2000);
+            } catch (error) {
+                // When database is not ready for I/O.
+                reject(error);
+            }
+        });
+    },
+    /**
+     * Enter sql by yourself!
+     * @requires sqlite A module to use sqlite.
+     * @param {string} sql sql command.
+     * @returns {Promise} Nothing returned.
+     */
+    run: function (sql) {
+        return new Promise((resolve, reject) => {
+            try {
+                console.log('SQLITE Run: ' + sql);
+                setTimeout(() => db_settings.run(sql).then(resolve, reject), db_settings ? 0 : 2000);
+            } catch (error) {
+                // When database is not ready for I/O.
+                reject(error);
+            }
+        });
+    },
+    /**
      * Read an entire table or a specific row in a table from database.
      * @requires sqlite A module to use sqlite.
      * @param {string} tableName Table name in database, like: Groups, Owners, Users... etc.
