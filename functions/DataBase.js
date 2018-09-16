@@ -163,7 +163,8 @@ module.exports = {
         return new Promise((resolve, reject) => {
             if (/\s/.test(tableName)) reject('tableName have whitespace(s).');
             try {
-                setTimeout(() => db_settings.run('CREATE TABLE "' + tableName + '" ("id" TEXT UNIQUE,' + sql + ' PRIMARY KEY("id"))').then(resolve, reject), db_settings ? 0 : 2000);
+                console.log('CREATE TABLE "' + tableName + '" ("id" TEXT UNIQUE,' + sql + ' PRIMARY KEY("id"))');
+                setTimeout(() => db_settings.run('CREATE TABLE "' + tableName + '" ("id" TEXT UNIQUE,' + sql + ', PRIMARY KEY("id"))').then(resolve, reject), db_settings ? 0 : 2000);
             } catch (error) {
                 reject(error);
             }

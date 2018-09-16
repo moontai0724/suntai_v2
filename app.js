@@ -257,12 +257,10 @@ async function MessageHandler(event) {
 
 // Check Keyword table exists or not, if not, create.
 var databaseReady = false;
-setTimeout(() => {
-    DataBase.checkTable('Keyword').then(exist => {
-        if (exist) databaseReady = true;
-        else DataBase.createTable('Keyword', '"author" TEXT NOT NULL, "method" TEXT NOT NULL, "keyword" TEXT NOT NULL, "dataType" TEXT NOT NULL, "data" TEXT NOT NULL').then(() => (databaseReady = true, console.log('Create Keyword database success!')), console.log);
-    });
-}, 5000);
+DataBase.checkTable('Keyword').then(exist => {
+    if (exist) databaseReady = true;
+    else DataBase.createTable('Keyword', '"author" TEXT NOT NULL, "method" TEXT NOT NULL, "keyword" TEXT NOT NULL, "dataType" TEXT NOT NULL, "data" TEXT NOT NULL').then(() => (databaseReady = true, console.log('Create Keyword database success!')), console.log);
+});
 
 // Earthquake check
 Earthquake.opendata();
