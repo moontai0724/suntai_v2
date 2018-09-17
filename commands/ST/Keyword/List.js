@@ -13,7 +13,7 @@ module.exports = {
             if (/-Here/.test(event.message.text)) param[param.length] = 'place="' + event.source[event.source.type + 'Id'] + '"';
             if (/-Public/.test(event.message.text)) param[param.length] = 'place="Public"';
             if (/-All/.test(event.message.text)) {
-                if (!await Authorize.Owner(event.source.userId)) all = true;
+                if (!(await Authorize.Owner(event.source.userId))) all = true;
                 else {
                     reject('您沒有權限讀取全部關鍵字回應！');
                     return 0;
