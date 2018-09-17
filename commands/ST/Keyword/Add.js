@@ -14,7 +14,7 @@ module.exports = {
                 if (await Authorize.Owner(event.source.userId)) dataType = "function";
             }
             DataBase.readTable('Keyword').then(keywordList => {
-                DataBase.insertValue('Keyword', [keywordList[keywordList.length - 1].id + 1, event.source.userId, event.source[event.source.type + 'Id'], keyword[2], keyword[1], dataType, keyword[3]]).then(() => {
+                DataBase.insertValue('Keyword', [Number(keywordList[keywordList.length - 1].id) + 1, event.source.userId, event.source[event.source.type + 'Id'], keyword[2], keyword[1], dataType, keyword[3]]).then(() => {
                     resolve(MsgFormat.Text("已經設定好以下回應：\n{\n  id: " + keywordList.length + ",\n  method: " + keyword[2] + ",\n  keyword: " + keyword[1] + ",\n  dataType: " + dataType + ",\n  data: " + keyword[3] + "\n}"));
                 }, reject);
             }, reject);
