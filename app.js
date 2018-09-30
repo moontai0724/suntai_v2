@@ -128,15 +128,15 @@ async function MessageHandler(event) {
                     DataBase.readTable('Keyword').then(keyword => {
                         keyword.forEach(value => {
                             value.keyword = decodeURIComponent(value.keyword);
-                            if ((new RegExp((value.method == 'FullCompare' ? '^' : '') + value.keyword + (value.method == 'FullCompare' ? '$' : ''))).test(event.message.text)) {
+                            if ((new RegExp((value.method == 'FullCompare' ? '^' : '') + decodeURIComponent(value.keyword) + (value.method == 'FullCompare' ? '$' : ''))).test(event.message.text)) {
                                 switch (value.dataType) {
                                     case 'text':
-                                        LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(value.data));
+                                        LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(decodeURIComponent(value.data)));
                                         break;
                                     case 'function':
                                         // must a Promise function
                                         // return a line message JSON object.
-                                        eval(value.data).then(message => {
+                                        eval(decodeURIComponent(value.data)).then(message => {
                                             if ((message[0] && message.length <= 5) || !message[0]) LineBotClient.replyMessage(event.replyToken, message);
                                             else LineBotClient.replyMessage(event.replyToken, MsgFormat.Text('訊息數量超過五則訊息限制而無法發送，請縮小執行動作的範圍，若認為是錯誤請告知開發者。'));
                                         }, err => LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(err)));
@@ -260,6 +260,10 @@ var databaseReady = false;
 DataBase.checkTable('Keyword').then(exist => {
     if (exist) databaseReady = true;
     else DataBase.createTable('Keyword', '"author" TEXT NOT NULL, "place" TEXT NOT NULL, "method" TEXT NOT NULL, "keyword" TEXT NOT NULL, "dataType" TEXT NOT NULL, "data" TEXT NOT NULL').then(() => (databaseReady = true, console.log('Create Keyword database success!')), console.log);
+});
+
+DataBase.checkTable('KeywordBanList').then(exist => {
+    if (!exist) DataBase.createTable('KeywordBanList', '"data" TEXT NOT NULL');
 });
 
 // Earthquake check
