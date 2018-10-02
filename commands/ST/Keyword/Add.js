@@ -17,7 +17,7 @@ module.exports = {
             // 禁止回應某些關鍵字
             DataBase.readTable('KeywordBanList').then(banList => {
                 banList.forEach(value => {
-                    if ((new RegExp(decodeURIComponent(value))).test(keyword[3])) {
+                    if ((new RegExp(decodeURIComponent(value.data))).test(keyword[3])) {
                         reject('您的關鍵字回應中含有被禁止的關鍵字。');
                         return 0;
                     }
