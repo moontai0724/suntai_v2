@@ -9,10 +9,10 @@ module.exports = {
     MessageHandler: function (event) {
         return new Promise(async function (resolve, reject) {
             var param = [], all = false;
-            if (/-My/.test(event.message.text)) param[param.length] = 'author="' + event.source.userId + '"';
-            if (/-Here/.test(event.message.text)) param[param.length] = 'place="' + event.source[event.source.type + 'Id'] + '"';
-            if (/-Public/.test(event.message.text)) param[param.length] = 'place="Public"';
-            if (/-All/.test(event.message.text)) {
+            if (/-M(y)?/i.test(event.message.text)) param[param.length] = 'author="' + event.source.userId + '"';
+            if (/-H(ere)?/i.test(event.message.text)) param[param.length] = 'place="' + event.source[event.source.type + 'Id'] + '"';
+            if (/-P(ublic)?/i.test(event.message.text)) param[param.length] = 'place="Public"';
+            if (/-A(ll)?/i.test(event.message.text)) {
                 if (await Authorize.Owner(event.source.userId)) all = true;
                 else {
                     reject('您沒有權限讀取全部關鍵字回應！');
