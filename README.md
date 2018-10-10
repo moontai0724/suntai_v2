@@ -3,7 +3,7 @@ A project of chatbot which use Developer Trial plan.
 
 ## 安裝與執行
 - Windows `StartServer.bat` 
-- Linux   `StartServer.sh`
+- Linux  先執行 `ngrok http 127.0.0.1:8080` 在執行 `StartServer.sh`
 
 ## 特點
 * 自動讀取指令，只需對資料夾新增資料即可
