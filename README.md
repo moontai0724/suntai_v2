@@ -1,14 +1,20 @@
 # 日太 suntai
 A project of chatbot which use Developer Trial plan.
 
+## 安裝與執行
+- Windows `StartServer.bat` 
+- Linux   `StartServer.sh`
+
 ## 特點
 * 自動讀取指令，只需對資料夾新增資料即可
 
 ## 注意事項
-* 需要一個 config.json 檔案，在第一次執行後會自動在跟目錄產生 config 資料夾，內含 config.json 檔案。config.json 檔案必須至少含有 line webhook 的 channelSecret 跟 channelAccessToken。
-* Bot 用到 sqlite database，若沒有已經可以使用的 database (settings/settings.sqlite) 將無法正常運作。
+* 需要一個 `config.json` 檔案，在第一次執行後會自動在跟目錄產生 config 資料夾，內含 `config.json` 檔案。`config.json` 檔案必須至少含有 line webhook 的 channelSecret 跟 channelAccessToken。
+* Bot 用到 sqlite database，若沒有已經可以使用的 database (database/settings.sqlite) 將無法正常運作 **(現行的版本會自動產生)**。
+* 其他[常見問題](FAQ.md)
 
-### Database (settings/settings.sqlite) 內容
+### Database (database/settings.sqlite) 內容
+在第一次執行的時候，會自動產生database。
 
 **Groups** -> 加入的群組
 `CREATE TABLE 'Groups' (
