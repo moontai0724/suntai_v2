@@ -4,10 +4,16 @@ module.exports = {
      * @param {string} replyText A string of text to format, max 2000 characters. Can include Unicode emoji or LINE original emoji. (https://developers.line.me/media/messaging-api/emoji-list.pdf)
      */
     Text: function (replyText) {
-        return {
-            "type": "text",
-            "text": replyText
-        };
+        if (replyText.length > 2000) {
+            let replyMsgArr = [];
+            for (let i = 0, o = 0; i < Math.ceil(replyText.length / 2000); ++i, o += 2000) replyMsgArr[i] = { "type": "text", "text": replyText.substr(o, 2000) };
+            return replyMsgArr;
+        } else {
+            return {
+                "type": "text",
+                "text": replyText
+            };
+        }
     },
     /**
      * Format message to a JSON format which line accept.

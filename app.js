@@ -95,9 +95,9 @@ const server = app.listen(8080);
 async function MessageHandler(event) {
     switch (event.type) {
         case 'message':
-            Chatlog.log(event);
+            setTimeout(() => Chatlog.log(event), 500);
             if (event.message.type == 'text') {
-                if (event.message.text.startsWith('/')) {
+                if (event.message.text.startsWith('/') && !event.message.text.startsWith('//')) {
                     // Returned data(s) must formatted!
                     if (event.message.text.toLowerCase().startsWith('/mt')) {
                         try {
@@ -120,29 +120,31 @@ async function MessageHandler(event) {
                         }).join(' ');
 
                         data.data.MessageHandler(event).then(message => {
-                            if (message[0]) {
-                                let change = [];
-                                message.forEach(value => {
-                                    if (value.type == 'text' && value.text.length > 2000) {
-                                        let replyMsgArr = [];
-                                        for (let i = 0, o = 0; i < Math.ceil(value.text.length / 2000); ++i, o += 2000) replyMsgArr[i] = value.text.substr(o, 2000);
-                                        value.text = replyMsgArr[0];
-                                        for (let i = 1; i < replyMsgArr.length; i++) {
-                                            change[change.length] = { "text": replyMsgArr[i], "previousText": replyMsgArr[i - 1] };
-                                        }
-                                    }
-                                });
-                                change.forEach(data => message.splice(message.findIndex(value => value.text == data.previousText) + 1, 0, MsgFormat.Text(data.text)));
-                            } else if (message.type == 'text' && message.text.length > 2000) {
-                                let replyMsgArr = [];
-                                for (let i = 0, o = 0; i < Math.ceil(message.text.length / 2000); ++i, o += 2000) replyMsgArr[i] = message.text.substr(o, 2000);
-                                message = replyMsgArr.map(value => MsgFormat.Text(value));
-                            }
-
                             if ((message[0] && message.length <= 5) || !message[0]) LineBotClient.replyMessage(event.replyToken, message);
                             else LineBotClient.replyMessage(event.replyToken, MsgFormat.Text('訊息數量超過五則訊息限制而無法發送，請縮小執行動作的範圍，若認為是錯誤請告知開發者。'));
                         }, err => LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(err)));
                     }, err => LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(err)));
+                } else if (databaseReady) {
+                    DataBase.readTable('Keyword').then(keyword => {
+                        keyword.forEach(value => {
+                            value.keyword = decodeURIComponent(value.keyword);
+                            if ((new RegExp((value.method == 'FullCompare' ? '^' : '') + decodeURIComponent(value.keyword) + (value.method == 'FullCompare' ? '$' : ''))).test(event.message.text)) {
+                                switch (value.dataType) {
+                                    case 'text':
+                                        LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(decodeURIComponent(value.data)));
+                                        break;
+                                    case 'function':
+                                        // must a Promise function
+                                        // return a line message JSON object.
+                                        eval(decodeURIComponent(value.data)).then(message => {
+                                            if ((message[0] && message.length <= 5) || !message[0]) LineBotClient.replyMessage(event.replyToken, message);
+                                            else LineBotClient.replyMessage(event.replyToken, MsgFormat.Text('訊息數量超過五則訊息限制而無法發送，請縮小執行動作的範圍，若認為是錯誤請告知開發者。'));
+                                        }, err => LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(err)));
+                                        break;
+                                }
+                            }
+                        });
+                    });
                 }
             }
             break;
@@ -154,8 +156,8 @@ async function MessageHandler(event) {
             switch (event.source.type) {
                 case 'group':
                     DataBase.readTable('Groups').then(groups => {
-                        if (groups.indexOf(event.source.groupId) == -1) DataBase.insertValue('Groups', event.source.groupId);
-                        else console.log('Groups ' + event.source.roomId + ' is not in database.');
+                        if (groups.findIndex(value => value.id == event.source.groupId) == -1) DataBase.insertValue('Groups', event.source.groupId);
+                        else console.log('Groups ' + event.source.roomId + ' is already in database.');
                     });
                     DataBase.readTable('OwnersNotice').then(ownersNotice => {
                         for (let i = 0; i < ownersNotice.length; i++) {
@@ -165,8 +167,8 @@ async function MessageHandler(event) {
                     break;
                 case 'room':
                     DataBase.readTable('Rooms').then(rooms => {
-                        if (rooms.indexOf(event.source.roomId) == -1) DataBase.insertValue('Rooms', event.source.roomId);
-                        else console.log('Room ' + event.source.roomId + ' is not in database.');
+                        if (rooms.findIndex(value => value.id == event.source.roomId) == -1) DataBase.insertValue('Rooms', event.source.roomId);
+                        else console.log('Room ' + event.source.roomId + ' is already in database.');
                     });
                     DataBase.readTable('OwnersNotice').then(ownersNotice => {
                         for (let i = 0; i < ownersNotice.length; i++) {
@@ -190,7 +192,7 @@ async function MessageHandler(event) {
             switch (event.source.type) {
                 case 'group':
                     DataBase.readTable('Groups').then(groups => {
-                        if (groups.indexOf(event.source.groupId) > -1) DataBase.deleteWithId('Groups', event.source.groupId);
+                        if (groups.findIndex(value => value.id == event.source.groupId) > -1) DataBase.deleteWithId('Groups', event.source.groupId);
                         else console.log('Groups ' + event.source.roomId + ' is not in database.');
                     });
                     DataBase.readTable('OwnersNotice').then(ownersNotice => {
@@ -201,7 +203,7 @@ async function MessageHandler(event) {
                     break;
                 case 'room':
                     DataBase.readTable('Rooms').then(rooms => {
-                        if (rooms.indexOf(event.source.roomId) > -1) DataBase.deleteWithId('Rooms', event.source.roomId);
+                        if (rooms.findIndex(value => value.id == event.source.roomId) > -1) DataBase.deleteWithId('Rooms', event.source.roomId);
                         else console.log('Room ' + event.source.roomId + ' is not in database.');
                     });
                     DataBase.readTable('OwnersNotice').then(ownersNotice => {
@@ -235,10 +237,10 @@ async function MessageHandler(event) {
                         console.log(data);
                         if (!data) {
                             console.log('There is no ngrokURL data in database.');
-                            DataBase.insertValue('Variables', ['ngrokURL', url]).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/24784567'), MsgFormat.Text(url)]));
+                            DataBase.insertValue('Variables', ['ngrokURL', url]).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/39849029'), MsgFormat.Text(url)]));
                         } else if (data[0].data != url) {
                             console.log('ngrokURL changed, write into database.');
-                            DataBase.updateValue('Variables', 'ngrokURL', { "data": url }).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/24784567'), MsgFormat.Text(url)]));
+                            DataBase.updateValue('Variables', 'ngrokURL', { "data": url }).then(() => LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', [MsgFormat.Text(UTC8Time.getTimeString() + '\n網址已變更，請手動更改網址為： ' + url + '.ngrok.io\n\nline: https://developers.line.me/console/channel/1558579961/basic/' + '\ngithub: https://github.com/moontai0724/suntaidev/settings/hooks/39849029'), MsgFormat.Text(url)]));
                         } else {
                             LineBotClient.pushMessage('R9906a7c54c6d722a5d523d937f32e677', MsgFormat.Text(UTC8Time.getTimeString() + '\n目前日太於 ' + url + ' 運作狀況良好。'));
                         }
@@ -252,6 +254,17 @@ async function MessageHandler(event) {
         UTC8Time.getTimePromise().then(time => checkConnect((((30 - time.minute % 30) * 60) - time.second) * 1000 - time.millisecond + 5000));
     }, ms);
 })();
+
+// Check Keyword table exists or not, if not, create.
+var databaseReady = false;
+DataBase.checkTable('Keyword').then(exist => {
+    if (exist) databaseReady = true;
+    else DataBase.createTable('Keyword', '"author" TEXT NOT NULL, "place" TEXT NOT NULL, "method" TEXT NOT NULL, "keyword" TEXT NOT NULL, "dataType" TEXT NOT NULL, "data" TEXT NOT NULL').then(() => (databaseReady = true, console.log('Create Keyword database success!')), console.log);
+});
+
+DataBase.checkTable('KeywordBanList').then(exist => {
+    if (!exist) DataBase.createTable('KeywordBanList', '"data" TEXT NOT NULL');
+});
 
 // Earthquake check
 Earthquake.opendata();

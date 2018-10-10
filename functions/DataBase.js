@@ -11,6 +11,57 @@ setTimeout(async function () {
 
 module.exports = {
     /**
+     * Enter sql by yourself!
+     * @requires sqlite A module to use sqlite.
+     * @param {string} sql sql command.
+     * @returns {Promise<Array<JSON>>} An array of JSON format list of specific data, or returns a promise rejection with error.
+     */
+    all: function (sql) {
+        return new Promise((resolve, reject) => {
+            try {
+                console.log('SQLITE All: ' + sql);
+                setTimeout(() => db_settings.all(sql).then(resolve, reject), db_settings ? 0 : 2000);
+            } catch (error) {
+                // When database is not ready for I/O.
+                reject(error);
+            }
+        });
+    },
+    /**
+     * Enter sql by yourself!
+     * @requires sqlite A module to use sqlite.
+     * @param {string} sql sql command.
+     * @returns {Promise<Array<JSON>>} An JSON format of specific data, or returns a promise rejection with error.
+     */
+    get: function (sql) {
+        return new Promise((resolve, reject) => {
+            try {
+                console.log('SQLITE Get: ' + sql);
+                setTimeout(() => db_settings.get(sql).then(resolve, reject), db_settings ? 0 : 2000);
+            } catch (error) {
+                // When database is not ready for I/O.
+                reject(error);
+            }
+        });
+    },
+    /**
+     * Enter sql by yourself!
+     * @requires sqlite A module to use sqlite.
+     * @param {string} sql sql command.
+     * @returns {Promise} Nothing returned.
+     */
+    run: function (sql) {
+        return new Promise((resolve, reject) => {
+            try {
+                console.log('SQLITE Run: ' + sql);
+                setTimeout(() => db_settings.run(sql).then(resolve, reject), db_settings ? 0 : 2000);
+            } catch (error) {
+                // When database is not ready for I/O.
+                reject(error);
+            }
+        });
+    },
+    /**
      * Read an entire table or a specific row in a table from database.
      * @requires sqlite A module to use sqlite.
      * @param {string} tableName Table name in database, like: Groups, Owners, Users... etc.
@@ -145,6 +196,45 @@ module.exports = {
             try {
                 console.log('DELETE FROM ' + tableName + ' WHERE id="' + id + '"');
                 setTimeout(() => db_settings.run('DELETE FROM ' + tableName + ' WHERE id="' + id + '"').then(resolve, reject), db_settings ? 0 : 2000);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    },
+    /**
+     * Create a table with sql command.
+     * @requires sqlite A module to use sqlite.
+     * @param {string} tableName Table name in database, like: Groups, Owners, Users... etc.
+     * @param {string} [sql] sql command to create column(s) without id column.
+     * @default sql CREATE TABLE tableName ("id" TEXT UNIQUE, PRIMARY KEY("id"))
+     * @example datatype: NULL, INTEGER, REAL, TEXT, BLOB
+     * @example NOT NULL, UNIQUE, DEFAULT(), CHECK()
+     */
+    createTable: function (tableName, sql = "") {
+        return new Promise((resolve, reject) => {
+            if (/\s/.test(tableName)) reject('tableName have whitespace(s).');
+            try {
+                console.log('CREATE TABLE "' + tableName + '" ("id" TEXT UNIQUE,' + sql + ' PRIMARY KEY("id"))');
+                setTimeout(() => db_settings.run('CREATE TABLE "' + tableName + '" ("id" TEXT UNIQUE,' + sql + ', PRIMARY KEY("id"))').then(resolve, reject), db_settings ? 0 : 2000);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    },
+    /**
+     * Check if a table already exist or not.
+     * @requires sqlite A module to use sqlite.
+     * @param {string} tableName The table name to check.
+     * @returns {Promise<Boolean>} If the table already exists, returns true; else, return false. Or returns a promise rejection with error.
+     */
+    checkTable: function (tableName) {
+        return new Promise((resolve, reject) => {
+            if (/\s/.test(tableName)) reject('tableName have whitespace(s).');
+            try {
+                setTimeout(() => db_settings.all('SELECT * FROM sqlite_master').then(tables => {
+                    if (tables.findIndex(value => value.tbl_name == tableName) > -1) resolve(true);
+                    else resolve(false);
+                }, reject), db_settings ? 0 : 2000);
             } catch (error) {
                 reject(error);
             }
