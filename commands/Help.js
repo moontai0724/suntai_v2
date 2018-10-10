@@ -1,16 +1,4 @@
-var correctPath = false;
-const functionsPath = require('fs').realpathSync('').split('\\').map(value => {
-    if (correctPath) {
-        return '';
-    } else if (!correctPath && value == 'commands') {
-        correctPath = true;
-        return value;
-    } else {
-        return value;
-    }
-}).join('\\').replace(/\\\\/g, '').replace('commands\\', 'commands').replace('\\commands', '') + '\\functions';
-
-const MsgFormat = require(functionsPath + '\\MsgFormat.js');
+const MsgFormat = require('../functions/MsgFormat.js')
 
 module.exports = {
     description: '您好，我是日太！在和我互動前請先詳讀以下事項：' +
