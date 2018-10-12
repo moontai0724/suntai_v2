@@ -19,7 +19,7 @@ module.exports = {
      * @returns An url of the Code at Pastebin.
      * @throws When text fails to upload, reject with http error.
      */
-    post: function (data, guest = false, private = 1, expire = "1D", title = "") {
+    post: function (data, guest = false, private = 1, expire = "1D", title = "", format = "text") {
         return new Promise(function (resolve, reject) {
             if (!data) reject('data param is required!');
             if (!(guest == true || guest == false)) reject('guest param err! Must be a boolean!');
@@ -36,6 +36,7 @@ module.exports = {
                     api_paste_private: Number(private),
                     api_paste_expire_date: expire,
                     api_paste_name: title,
+                    api_paste_format: format
                 },
                 success: function (data, status, xhr) {
                     console.log('Pastebin post success: ', data);
