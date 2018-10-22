@@ -1,12 +1,13 @@
 // packages
-const sqlite = require('sqlite');
+const sqlite = require("sqlite");
+const path = require("path");
 
 // ================================================== Start My Program ==================================================
 
 var db_settings;
 setTimeout(async function () {
     // Cause app.js located at root directory
-    db_settings = await sqlite.open('./database/settings.sqlite', { Promise });
+    db_settings = await sqlite.open(path.join(process.cwd(), "database", "settings.sqlite"), { Promise });
 });
 
 module.exports = {

@@ -1,18 +1,19 @@
 const fs = require('fs');
+const path = require("path");
 
 var commands = { name: 'commands', type: 'folder', data: undefined };
 
 /**
- * Read full file list of a path, and require all file.
+ * Read full file list of a dirPath, and require all file.
  * When folder name include '-' character, means the string after '-' character is a default command that will execute when use command of folder name.
  * @example Folder Name: ST-Help, command: /st. This will automatically redirected to /st help
- * @param {string} path A path which need to read.
+ * @param {string} dirPath A dirPath which need to read.
  * @returns {JSON} Return a JSON format of full command list.
  */
-function readPath(path = '') {
+function readPath(dirPath = '') {
     return new Promise(function (resolve) {
-        var base = './commands';
-        fs.readdir(base + path, async function (err, data) {
+        var base = path.join(process.cwd(), "commands");
+        fs.readdir(path.join(base, dirPath), async function (err, data) {
             if (!err) {
                 let response = {};
                 for (let i = 0; i < data.length; i++) {
@@ -27,10 +28,10 @@ function readPath(path = '') {
                             // Expected value: uppercase letter which transferred to lowercase letter in filename, like: h
                             shortName: data[i].split('.')[0].replace(/[^A-Z]/g, '').toLowerCase(),
                             // Parent commands
-                            parents: path.split("/").map(value => value.split('-')[0]).join(' ').replace(' ', ''),
+                            parents: dirPath.split(path.sep).map(value => value.split('-')[0]).join(' ').replace(' ', ''),
                             // Expected value: js
                             type: data[i].split('.')[1].toLowerCase(),
-                            data: require('.' + base + path + '/' + data[i])
+                            data: require(path.join(base, dirPath, data[i]))
                         };
                     } else if (!data[i].startsWith('-')) {
                         response[data[i].split('-')[0].toLowerCase()] = {
@@ -43,9 +44,9 @@ function readPath(path = '') {
                             // Expected value: uppercase letter which transferred to lowercase letter in dirname, like: mt
                             shortName: data[i].split('-')[0].replace(/[^A-Z]/g, '').toLowerCase(),
                             // Parent commands
-                            parents: path.split("/").map(value => value.split('-')[0]).join(' ').replace(' ', ''),
+                            parents: dirPath.split(path.sep).map(value => value.split('-')[0]).join(' ').replace(' ', ''),
                             type: 'folder',
-                            data: await readPath(path + '/' + data[i])
+                            data: await readPath(dirPath + path.sep + data[i])
                         };
                     }
                     if (i == data.length - 1) resolve(response);
@@ -53,7 +54,7 @@ function readPath(path = '') {
                 if (data.length == 0) resolve(response);
             } else setTimeout(async function () {
                 console.log(err);
-                resolve(await readPath(path));
+                resolve(await readPath(dirPath));
             }, 1000);
         });
     });
@@ -61,13 +62,13 @@ function readPath(path = '') {
 
 /**
  * To get full commands list and require all js files.
- * @param {string} path A path which need to read.
+ * @param {string} dirPath A dirPath which need to read.
  * @returns {JSON} A json format list of commands. 
  */
-function getCommandsInfo(path = '') {
+function getCommandsInfo(dirPath = '') {
     return new Promise(async function (resolve) {
         console.log('getCommandsInfo');
-        if (commands.data == undefined) commands.data = await readPath(path);
+        if (commands.data == undefined) commands.data = await readPath(dirPath);
         resolve(commands);
     });
 }

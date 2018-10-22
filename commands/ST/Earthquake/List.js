@@ -1,6 +1,7 @@
+const path = require("path");
+
 // Own functions
-const MsgFormat = require('../../../functions/MsgFormat.js');
-const database = require('../../../functions/DataBase.js');
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
 
 module.exports = {
 	description: '獲取可設定的地震通知縣市。',

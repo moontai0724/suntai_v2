@@ -1,4 +1,5 @@
-const DataBase = require('./DataBase.js');
+const path = require("path");
+const DataBase = require(path.join(__dirname, "DataBase.js"));
 
 module.exports = {
     /**

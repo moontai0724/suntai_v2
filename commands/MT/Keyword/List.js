@@ -1,7 +1,9 @@
+const path = require("path");
+
 // Own functions
-const MsgFormat = require('../../../functions/MsgFormat.js');
-const DataBase = require('../../../functions/DataBase.js');
-const Pastebin = require('../../../functions/Pastebin.js');
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
+const DataBase = require(path.join(process.cwd(), "functions", "DataBase.js"));
+const Pastebin = require(path.join(process.cwd(), "functions", "Pastebin.js"));
 
 module.exports = {
     description: '列出目前有的禁止關鍵字。',

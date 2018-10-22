@@ -1,6 +1,8 @@
+const path = require("path");
+
 // Own functions
-const MsgFormat = require('../../../functions/MsgFormat.js');
-const CommandsList = require('../../../functions/CommandsList.js');
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
+const CommandsList = require(path.join(process.cwd(), "functions", "CommandsList.js"));
 
 module.exports = {
     description: '訊息記錄相關功能。',

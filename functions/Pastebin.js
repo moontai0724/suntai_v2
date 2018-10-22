@@ -1,9 +1,10 @@
 const najax = $ = require('najax');
-const Config = require('../config/config.json');
+const path = require("path");
+const Config = require(path.join(process.cwd(), "config", "config.json"));
 
 if (!Config.Pastebin) {
     Config.Pastebin = { "api_dev_key": "", "api_user_key": "" };
-    require('fs').writeFileSync('./config/config.json', JSON.stringify(Config));
+    require('fs').writeFileSync(path.join(process.cwd(), "config", "config.json"), JSON.stringify(Config));
 }
 
 module.exports = {

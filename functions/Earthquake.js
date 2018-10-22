@@ -1,8 +1,10 @@
+const path = require("path");
+
 // Require Line Bot SDK
 const LineBotSDK = require('@line/bot-sdk');
 
 // Require config
-const Config = require('../config/config.json');
+const Config = require(path.join(process.cwd(), "config", "config.json"));
 const LineBotClient = new LineBotSDK.Client(Config.LineBot);
 
 // packages
@@ -10,9 +12,9 @@ const najax = $ = require('najax');
 const parseString = require('xml2js').parseString;
 
 // Own functions
-const DataBase = require('./DataBase.js');
-const MsgFormat = require('./MsgFormat.js');
-const Imgur = require('./Imgur.js');
+const DataBase = require(path.join(__dirname, "DataBase.js"));
+const MsgFormat = require(path.join(__dirname, "MsgFormat.js"));
+const Imgur = require(path.join(__dirname, "Imgur.js"));
 
 module.exports = {
     /**

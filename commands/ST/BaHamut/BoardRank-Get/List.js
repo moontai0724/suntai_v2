@@ -1,5 +1,7 @@
+const path = require("path");
+
 // Own functions
-const MsgFormat = require('../../../../functions/MsgFormat.js');
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
 const boardClasses = [{
     "c": "21", "name": "全", "sub":
         [

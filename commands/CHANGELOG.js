@@ -1,4 +1,7 @@
-const MsgFormat = require('../functions/MsgFormat.js');
+const path = require("path");
+
+// Own functions
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
 
 module.exports = {
     description: "Changelog.",

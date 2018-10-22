@@ -1,6 +1,8 @@
-// Own functions
-const MsgFormat = require('../../../../functions/MsgFormat.js');
+const path = require("path");
 const najax = $ = require('najax');
+
+// Own functions
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
 
 module.exports = {
     description: '獲取巴哈姆特動漫電玩通題目之答案，指令參數：<題目編號>' +

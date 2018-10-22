@@ -1,26 +1,28 @@
+const path = require("path");
+
 // Require Line Bot SDK
 const LineBotSDK = require('@line/bot-sdk');
 
 // Require config
-const Config = require('../config/config.json');
+const Config = require(path.join(process.cwd(), "config", "config.json"));
 const LineBotClient = new LineBotSDK.Client(Config.LineBot);
 
 // nodejs built-in package
-const fs = require('fs');
+const fs = require("fs");
 
 // packages
-const sqlite = require('sqlite');
+const sqlite = require("sqlite");
 
 // Own functions
-const UTC8Time = require('./UTC8Time.js'); //ok.include: getNowTime(function), value
+const UTC8Time = require(path.join(__dirname, "UTC8Time.js")); //ok.include: getNowTime(function), value
 
 // Create if no such dir
-if (!fs.existsSync('./ChatlogFiles')) fs.mkdir('./ChatlogFiles', () => console.log('Spawned ChatlogFiles dir.'));
-if (!fs.existsSync('./database')) fs.mkdir('./database', () => console.log('Spawned database dir.'));
+if (!fs.existsSync(path.join(process.cwd(), "ChatlogFiles"))) fs.mkdir(path.join(process.cwd(), "ChatlogFiles"), () => console.log("Spawned ChatlogFiles dir."));
+if (!fs.existsSync(path.join(process.cwd(), "database"))) fs.mkdir(path.join(process.cwd(), "database"), () => console.log("Spawned database dir."));
 
 var Chatlog;
 setTimeout(async function () {
-    Chatlog = await sqlite.open('./database/Chatlog.sqlite', { Promise });
+    Chatlog = await sqlite.open(path.join(process.cwd(), "database", "Chatlog.sqlite"), { Promise });
 });
 
 module.exports = {
@@ -104,7 +106,7 @@ module.exports = {
         function SaveFile(extension) {
             LineBotClient.getMessageContent(event.message.id).then(res => {
                 if (!extension) { extension = res.headers['content-type'].split('/')[1] }
-                var file = fs.createWriteStream('./ChatlogFiles/' + event.timestamp + '.' + extension);
+                var file = fs.createWriteStream(path.join(process.cwd(), "ChatlogFiles", event.timestamp + '.' + extension));
                 res.on('data', chunk => file.write(chunk));
                 res.on('end', () => {
                     file.end();
@@ -135,9 +137,9 @@ module.exports = {
     },
     deleteOutdatedFiles: function (specificTimestamp) {
         if (!specificTimestamp) specificTimestamp = UTC8Time.getTimestamp() - 604800000 - 604800000 - 604800000 - 604800000;
-        fs.readdir('./ChatlogFiles', (err, files) => {
+        fs.readdir(path.join(process.cwd(), "ChatlogFiles"), (err, files) => {
             for (let i = 0; i < files.length; i++) {
-                if (Number(files[i].split('.')[0]) < specificTimestamp) fs.unlink('./ChatlogFiles/' + files[i]);
+                if (Number(files[i].split('.')[0]) < specificTimestamp) fs.unlink(path.join(process.cwd(), "ChatlogFiles", files[i]));
             }
         });
     },

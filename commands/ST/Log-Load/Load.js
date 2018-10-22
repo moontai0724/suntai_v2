@@ -1,14 +1,16 @@
+const path = require("path");
+
 // Require Line Bot SDK
 const LineBotSDK = require('@line/bot-sdk');
 
 // Require config
-const Config = require('../../../config/config.json');
+const Config = require(path.join(process.cwd(), "config", "config.json"));
 const LineBotClient = new LineBotSDK.Client(Config.LineBot);
 
 // Own functions
-const MsgFormat = require('../../../functions/MsgFormat.js');
-const Authorize = require('../../../functions/Authorize.js');
-const Chatlog = require('../../../functions/Chatlog.js');
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
+const Authorize = require(path.join(process.cwd(), "functions", "Authorize.js"));
+const Chatlog = require(path.join(process.cwd(), "functions", "Chatlog.js"));
 
 module.exports = {
     description: '調閱紀錄功能。',

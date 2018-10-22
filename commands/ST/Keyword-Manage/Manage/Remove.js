@@ -1,7 +1,9 @@
+const path = require("path");
+
 // Own functions
-const MsgFormat = require('../../../../functions/MsgFormat.js');
-const DataBase = require('../../../../functions/DataBase.js');
-const Authorize = require('../../../../functions/Authorize.js');
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
+const DataBase = require(path.join(process.cwd(), "functions", "DataBase.js"));
+const Authorize = require(path.join(process.cwd(), "functions", "Authorize.js"));
 
 module.exports = {
     description: '刪除關鍵字回應，指令格式：<id>，只能刪除自己創建的關鍵字回應。',
