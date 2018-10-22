@@ -1,8 +1,8 @@
 // Own functions
-const MsgFormat = require('../../../functions/MsgFormat.js');
-const DataBase = require('../../../functions/DataBase.js');
-const Pastebin = require('../../../functions/Pastebin.js');
-const Authorize = require('../../../functions/Authorize.js');
+const MsgFormat = require('../../../../functions/MsgFormat.js');
+const DataBase = require('../../../../functions/DataBase.js');
+const Pastebin = require('../../../../functions/Pastebin.js');
+const Authorize = require('../../../../functions/Authorize.js');
 
 module.exports = {
     description: '列出目前有的關鍵字回應，參數：-My 顯示自己的回應清單、-Here 顯示此群組內創建的清單、-Public 顯示公共回應清單，-All 顯示全部。',

@@ -1,6 +1,6 @@
 // Own functions
-const MsgFormat = require('../../../functions/MsgFormat.js');
-const CommandsList = require('../../../functions/CommandsList.js');
+const MsgFormat = require('../../../../functions/MsgFormat.js');
+const CommandsList = require('../../../../functions/CommandsList.js');
 
 module.exports = {
     description: '關鍵字回應功能。',

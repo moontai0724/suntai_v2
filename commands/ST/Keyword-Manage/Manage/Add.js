@@ -1,7 +1,7 @@
 // Own functions
-const MsgFormat = require('../../../functions/MsgFormat.js');
-const DataBase = require('../../../functions/DataBase.js');
-const Authorize = require('../../../functions/Authorize.js');
+const MsgFormat = require('../../../../functions/MsgFormat.js');
+const DataBase = require('../../../../functions/DataBase.js');
+const Authorize = require('../../../../functions/Authorize.js');
 
 module.exports = {
     description: '新增關鍵字回應，指令格式：<keyword> -method <FullCompare(完全符合)|PartCompare(部分符合))> -response <response>，可以使用正則，如使用正則需選擇 PartCompare。',
