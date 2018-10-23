@@ -3,13 +3,13 @@ A project of chatbot which use Developer Trial plan.
 
 ## 安裝與執行
 - Windows `StartServer.bat` 
-- Linux  先執行 `ngrok http 127.0.0.1:8080` 在執行 `StartServer.sh`
+- Linux  先執行 `ngrok http 127.0.0.1:8080` 再執行 `StartServer.sh`
 
 ## 特點
 * 自動讀取指令，只需對資料夾新增資料即可
 
 ## 注意事項
-* 需要一個 `config.json` 檔案，在第一次執行後會自動在跟目錄產生 config 資料夾，內含 `config.json` 檔案。`config.json` 檔案必須至少含有 line webhook 的 channelSecret 跟 channelAccessToken。
+* 需要一個 `config.json` 檔案，在第一次執行後會自動在跟目錄產生 config 資料夾，內含 `config.json` 檔案。`config.json` 檔案必須至少含有 `line webhook` 的 `channelSecret` 跟 `channelAccessToken`。
 * Bot 用到 sqlite database，若沒有已經可以使用的 database (database/settings.sqlite) 將無法正常運作 **(現行的版本會自動產生)**。
 * 其他[常見問題](FAQ.md)
 
