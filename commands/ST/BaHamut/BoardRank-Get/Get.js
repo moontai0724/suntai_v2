@@ -1,7 +1,9 @@
-// Own functions
-const MsgFormat = require('../../../../functions/MsgFormat.js');
+const path = require("path");
 const najax = $ = require('najax');
-const boardClasses = require('./List.js').value;
+
+// Own functions
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
+const boardClasses = require(path.join(__dirname, 'List.js')).value;
 
 module.exports = {
     description: '獲取巴哈姆特看板排名，指令參數：[排名數量]:10 [看板類別]:21(全)' +

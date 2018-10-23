@@ -1,6 +1,8 @@
+const path = require("path");
+
 // Own functions
-const MsgFormat = require('../../../../functions/MsgFormat.js');
-const CommandsList = require('../../../../functions/CommandsList.js');
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
+const CommandsList = require(path.join(process.cwd(), "functions", "CommandsList.js"));
 
 module.exports = {
     description: '巴哈姆特看板排名相關功能。',

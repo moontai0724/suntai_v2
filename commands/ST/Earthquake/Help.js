@@ -1,6 +1,8 @@
+const path = require("path");
+
 // Own functions
-const MsgFormat = require('../../../functions/MsgFormat.js');
-const CommandsList = require('../../../functions/CommandsList.js');
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
+const CommandsList = require(path.join(process.cwd(), "functions", "CommandsList.js"));
 
 module.exports = {
     description: '地震通知相關設定（約震後七分鐘通知）。',

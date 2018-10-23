@@ -1,10 +1,11 @@
+const path = require("path");
 const najax = $ = require('najax');
-const UTC8Time = require('./UTC8Time.js');
-const Config = require('../config/config.json');
+const UTC8Time = require(path.join(__dirname, "UTC8Time.js"));
+const Config = require(path.join(process.cwd(), "config", "config.json"));
 
 if (!Config.Imgur) {
     Config.Imgur = { "refresh_token": "", "client_id": "", "client_secret": "" };
-    require('fs').writeFileSync('./config/config.json', JSON.stringify(Config));
+    require('fs').writeFileSync(path.join(process.cwd(), "config", "config.json"), JSON.stringify(Config));
 }
 
 module.exports = {

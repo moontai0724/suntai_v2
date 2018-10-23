@@ -1,4 +1,7 @@
-const MsgFormat = require('../functions/MsgFormat.js')
+const path = require("path");
+
+// Own functions
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
 
 module.exports = {
     description: '您好，我是日太！在和我互動前請先詳讀以下事項：' +

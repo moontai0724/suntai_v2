@@ -13,27 +13,28 @@ const najax = $ = require('najax');
 const parseString = require('xml2js').parseString;
 const sqlite = require('sqlite');
 const ping = require('ping-net');
+const path = require("path");
 
 // Own functions
-const Authorize = require('./functions/Authorize.js');
-const Chatlog = require('./functions/Chatlog.js');
-const CommandsList = require('./functions/CommandsList.js');
-const DataBase = require('./functions/DataBase.js');
-const Earthquake = require('./functions/Earthquake.js');
-const Imgur = require('./functions/Imgur.js');
-const MsgFormat = require('./functions/MsgFormat.js');
-const UTC8Time = require('./functions/UTC8Time.js');
+const Authorize = require(path.join(__dirname, "functions", "Authorize.js"));
+const Chatlog = require(path.join(__dirname, "functions", "Chatlog.js"));
+const CommandsList = require(path.join(__dirname, "functions", "CommandsList.js"));
+const DataBase = require(path.join(__dirname, "functions", "DataBase.js"));
+const Earthquake = require(path.join(__dirname, "functions", "Earthquake.js"));
+const Imgur = require(path.join(__dirname, "functions", "Imgur.js"));
+const MsgFormat = require(path.join(__dirname, "functions", "MsgFormat.js"));
+const UTC8Time = require(path.join(__dirname, "functions", "UTC8Time.js"));
 
-if (fs.existsSync('./config')) {
-    if (!fs.existsSync('./config/config.json')) {
-        fs.writeFileSync('./config/config.json', '{\n\t"LineBot": {\n\t\t"channelSecret": "",\n\t\t"channelAccessToken": ""\n\t}\n}');
+if (fs.existsSync(path.join(__dirname, "config"))) {
+    if (!fs.existsSync(path.join(__dirname, "config", "config.json"))) {
+        fs.writeFileSync(path.join(__dirname, "config", "config.json"), '{\n\t"LineBot": {\n\t\t"channelSecret": "",\n\t\t"channelAccessToken": ""\n\t}\n}');
     }
 } else {
-    fs.mkdirSync('./config');
-    fs.writeFileSync('./config/config.json', '{\n\t"LineBot": {\n\t\t"channelSecret": "",\n\t\t"channelAccessToken": ""\n\t}\n}');
+    fs.mkdirSync(path.join(__dirname, "config"));
+    fs.writeFileSync(path.join(__dirname, "config", "config.json"), '{\n\t"LineBot": {\n\t\t"channelSecret": "",\n\t\t"channelAccessToken": ""\n\t}\n}');
 }
 
-const Config = require('./config/config.json');
+const Config = require(path.join(__dirname, "config", "config.json"));
 const app = new Koa();
 const router = new KoaRouter();
 const LineBotClient = new LineBotSDK.Client(Config.LineBot);

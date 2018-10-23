@@ -1,6 +1,8 @@
+const path = require("path");
+
 // Own functions
-const MsgFormat = require('../../../functions/MsgFormat.js');
-const DataBase = require('../../../functions/DataBase.js');
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
+const DataBase = require(path.join(process.cwd(), "functions", "DataBase.js"));
 
 module.exports = {
     description: '關閉地震通知。',

@@ -1,6 +1,8 @@
+const path = require("path");
+
 // Own functions
-const MsgFormat = require('../../../functions/MsgFormat.js');
-const Chatlog = require('../../../functions/Chatlog.js');
+const MsgFormat = require(path.join(process.cwd(), "functions", "MsgFormat.js"));
+const Chatlog = require(path.join(process.cwd(), "functions", "Chatlog.js"));
 
 module.exports = {
     description: '群組各類訊息發言次數排名查詢。',
