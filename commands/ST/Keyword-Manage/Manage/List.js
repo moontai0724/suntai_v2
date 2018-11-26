@@ -25,7 +25,16 @@ module.exports = {
             if (param.length == 0 && !all) reject('缺少參數，參數：-My 顯示自己的回應清單、-Here 顯示此群組內創建的清單、-Public 顯示公共回應清單，-All 顯示全部。');
 
             DataBase.all('SELECT * FROM Keyword' + (!all ? ' WHERE ' + param.join(' AND ') : '')).then(keyword => {
-                Pastebin.post(keyword.map(value => '{\n\t"id": "' + value.id + '",\n\t"author": "' + value.author + '",\n\t"place": "' + value.place + '",\n\t"method": "' + value.method + '",\n\t"keyword": "' + decodeURIComponent(value.keyword) + '",\n\t"dataType": "' + value.dataType + '",\n\t"data": "' + decodeURIComponent(value.data) + '"\n}').join('\n'), false, 1, '10M', 'SunTai Keyword Response List (' + (new Date()).toLocaleString('zh-tw', { hour12: false }) + ')', 'json').then(url => resolve(MsgFormat.Text('關鍵字回應詳細清單如下：' + url)), reject)
+                Pastebin.post(keyword.map(value =>
+                    '{\n\t"id": "' + value.id
+                    + '",\n\t"author": "' + value.author
+                    + '",\n\t"place": "' + value.place
+                    + '",\n\t"method": "' + value.method
+                    + '",\n\t"keyword": "' + decodeURIComponent(value.keyword)
+                    + '",\n\t"dataType": "' + value.dataType
+                    + '",\n\t"data": "' + decodeURIComponent(value.data)
+                    + '"\n}').join(',\n'), false, 1, '10M', 'SunTai Keyword Response List (' + (new Date()).toLocaleString('zh-tw', { hour12: false }) + ')', 'json')
+                    .then(url => resolve(MsgFormat.Text('關鍵字回應詳細清單如下：' + url)), reject);
             }, reject);
         });
     }
