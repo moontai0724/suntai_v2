@@ -17,29 +17,21 @@ module.exports = {
             }
 
             keywords.forEach(value => {
-                if (value.regex.test(event.message.text)) {
+                if (value.regex.test(event.message.text))
                     value.response(event).then(resolve, reject);
-                    return 0;
-                }
             });
 
             DataBase.readTable('Keyword').then(keyword => {
                 keyword.forEach(value => {
                     if (value.dataType == "text" && /F(ull)?C(ompare)?/i.test(value.method)) {
-                        if (event.message.text == decodeURIComponent(value.keyword)) {
-                            LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(decodeURIComponent(value.data)));
-                            return 0;
-                        }
+                        if (event.message.text == decodeURIComponent(value.keyword))
+                            resolve(MsgFormat.Text(decodeURIComponent(value.data)));
                     } else if (value.dataType == "text" && /P(art)?C(ompare)?/i.test(value.method)) {
-                        if (event.message.text.indexOf(decodeURIComponent(value.keyword)) > -1) {
-                            LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(decodeURIComponent(value.data)));
-                            return 0;
-                        }
+                        if (event.message.text.indexOf(decodeURIComponent(value.keyword)) > -1)
+                            resolve(MsgFormat.Text(decodeURIComponent(value.data)));
                     } else if (value.dataType == "Regexp") {
-                        if (new RegExp(decodeURIComponent(value.keyword)).test(event.message.text)) {
-                            LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(decodeURIComponent(value.data)));
-                            return 0;
-                        }
+                        if (new RegExp(decodeURIComponent(value.keyword)).test(event.message.text))
+                            resolve(MsgFormat.Text(decodeURIComponent(value.data)));
                     }
                 });
             });
