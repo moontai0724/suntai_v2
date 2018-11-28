@@ -1,7 +1,7 @@
 const path = require("path");
 
 // Own functions
-const fortuneStick = require(path.join(__dirname, "FortuneStick.json"));
+const fortuneStick = require(path.join(process.cwd(), "functions", "FortuneStick.json"));
 // Source: https://gist.github.com/d94bb0a9f37cfd362453
 
 module.exports = {
