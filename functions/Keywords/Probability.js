@@ -8,7 +8,7 @@ module.exports = {
     regex: /求[\s\S]*的機率/,
     response: function (event) {
         return new Promise((resolve, reject) => {
-            resolve(MsgFormat.Text(Math.floor(Math.random() * 100) + " %　です。"));
+            resolve(MsgFormat.Text(Math.floor(Math.random() * 100) + " ％です。"));
         });
     }
 };
