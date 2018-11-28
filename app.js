@@ -24,6 +24,7 @@ const Earthquake = require(path.join(__dirname, "functions", "Earthquake.js"));
 const Imgur = require(path.join(__dirname, "functions", "Imgur.js"));
 const MsgFormat = require(path.join(__dirname, "functions", "MsgFormat.js"));
 const UTC8Time = require(path.join(__dirname, "functions", "UTC8Time.js"));
+const Keyword = require(path.join(__dirname, "functions", "Keyword.js"));
 
 if (fs.existsSync(path.join(__dirname, "config"))) {
     if (!fs.existsSync(path.join(__dirname, "config", "config.json"))) {
@@ -111,7 +112,7 @@ async function MessageHandler(event) {
                         console.log(data);
                         event.message.originalText = event.message.text;
                         event.data = data;
-                        event.message.text = event.message.text = event.message.text.split(' ').filter((value, index) => {
+                        event.message.text = event.message.text.split(' ').filter((value, index) => {
                             return !((data.parents + ' ' + data.name).split(' ')[index] ? (new RegExp(((data.parents + ' ' + data.name).split(' ')[index]), "i", "^", "$")).test(value) || (new RegExp((data.parents + ' ' + data.name).split(' ')[index].replace(/[^A-Z]/g, ''), "i", "^", "$").test(value)) : false);
                         }).join(' ');
 
@@ -121,26 +122,10 @@ async function MessageHandler(event) {
                         }, err => LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(err)));
                     }, err => LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(err)));
                 } else if (databaseReady) {
-                    DataBase.readTable('Keyword').then(keyword => {
-                        keyword.forEach(value => {
-                            if (value.dataType == "text" && /F(ull)?C(ompare)?/i.test(value.method)) {
-                                if (event.message.text == value.decodeURIComponent(value.keyword)) {
-                                    LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(decodeURIComponent(value.data)));
-                                    return 0;
-                                }
-                            } else if (value.dataType == "text" && /P(art)?C(ompare)?/i.test(value.method)) {
-                                if (event.message.text.indexOf(decodeURIComponent(value.keyword)) > -1) {
-                                    LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(decodeURIComponent(value.data)));
-                                    return 0;
-                                }
-                            } else if (value.dataType == "Regexp") {
-                                if (new RegExp(decodeURIComponent(value.keyword)).test(event.message.text)) {
-                                    LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(decodeURIComponent(value.data)));
-                                    return 0;
-                                }
-                            }
-                        });
-                    });
+                    Keyword.judge(event).then(message => {
+                        if ((message[0] && message.length <= 5) || !message[0]) LineBotClient.replyMessage(event.replyToken, message);
+                        else LineBotClient.replyMessage(event.replyToken, MsgFormat.Text('訊息數量超過五則訊息限制而無法發送，請縮小執行動作的範圍，若認為是錯誤請告知開發者。'));
+                    }, err => LineBotClient.replyMessage(event.replyToken, MsgFormat.Text(err)));
                 }
             }
             break;
