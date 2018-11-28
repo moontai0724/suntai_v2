@@ -9,12 +9,13 @@ module.exports = {
     description: '解指定的籤。',
     MessageHandler: function (event) {
         return new Promise(async function (resolve, reject) {
-            if (/^[0-9]{1,2}$/.test(event.message.text)) {
-                let replyMsg = `籤號：${fortuneStick[rn].id}　${fortuneStick[rn].type}！\n解籤：${fortuneStick[StickNumber].explain}\n`;
-                for (let key in fortuneStick[StickNumber].result) {
-                    replyMsg += `\n${key}：${fortuneStick[StickNumber].result[key]}`;
+            if (isNaN(event.message.text) == false && 1 <= Number(event.message.text) && Number(event.message.text) <= 100 && /^([0-9]{1,2}|100)$/.test(event.message.text)) {
+                let stickNumber = Number(event.message.text);
+                let replyMsg = `籤號：${fortuneStick[stickNumber].id}　${fortuneStick[stickNumber].type}！\n解籤：${fortuneStick[stickNumber].explain}\n`;
+                for (let key in fortuneStick[stickNumber].result) {
+                    replyMsg += `\n${key}：${fortuneStick[stickNumber].result[key]}`;
                 }
-                resolve(replyMsg);
+                resolve(MsgFormat.Text(replyMsg));
             } else reject("籤號錯誤");
         });
     }

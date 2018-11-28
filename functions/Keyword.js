@@ -10,7 +10,7 @@ module.exports = {
     judge: function (event) {
         return new Promise((resolve, reject) => {
             // init
-            if (keyword.length == 0) {
+            if (keywords.length == 0) {
                 fs.readdir(path.join(process.cwd(), "functions", "Keywords"), (err, files) => {
                     files.forEach(value => keywords.push(require(path.join(process.cwd(), "functions", "Keywords", value))));
                 });

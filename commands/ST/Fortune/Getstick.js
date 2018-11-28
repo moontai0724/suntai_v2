@@ -8,19 +8,20 @@ module.exports = {
     description: '運勢抽籤相關功能。',
     MessageHandler: function (event) {
         return new Promise(async function (resolve, reject) {
-            if (/^[0-9]{1,2}$/.test(event.message.text)) {
+            if (isNaN(event.message.text) == false && 1 <= Number(event.message.text) && Number(event.message.text) <= 100 && /^([0-9]{1,2}|100)$/.test(event.message.text)) {
+                let stickNumber = Number(event.message.text);
                 resolve({
                     type: "template",
-                    altText: `籤號：${fortuneStick[event.message.text].id}　${fortuneStick[event.message.text].type}！\n籤詩：${fortuneStick[event.message.text].poem}\n\n解籤請打 /ST Fortune Solve ${fortuneStick[rn].id}`,
+                    altText: `籤號：${fortuneStick[stickNumber].id}　${fortuneStick[stickNumber].type}！\n籤詩：${fortuneStick[stickNumber].poem}\n\n解籤請打 /ST Fortune Solve ${fortuneStick[rn].id}`,
                     template: {
                         "type": "buttons",
-                        "title": `籤號：${fortuneStick[event.message.text].id}　${fortuneStick[event.message.text].type}！`,
-                        "text": fortuneStick[event.message.text].poem,
+                        "title": `籤號：${fortuneStick[stickNumber].id}　${fortuneStick[stickNumber].type}！`,
+                        "text": fortuneStick[stickNumber].poem,
                         "actions": [
                             {
                                 "type": "message",
                                 "label": "解籤",
-                                "text": "/ST Fortune Solve " + fortuneStick[event.message.text].id
+                                "text": "/ST Fortune Solve " + fortuneStick[stickNumber].id
                             }
                         ]
                     }

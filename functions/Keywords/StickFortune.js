@@ -1,7 +1,7 @@
 const path = require("path");
 
 // Own functions
-const fortuneStick = require(path.join(__dirname, "FortuneStick.json"));
+const fortuneStick = require(path.join(process.cwd(), "functions", "FortuneStick.json"));
 // Source: https://gist.github.com/d94bb0a9f37cfd362453
 
 module.exports = {
@@ -9,6 +9,7 @@ module.exports = {
     regex: /籤運/,
     response: function (event) {
         return new Promise((resolve, reject) => {
+            let rn = Math.floor(Math.random() * 100);
             resolve({
                 type: "template",
                 altText: `籤號：${fortuneStick[rn].id}　${fortuneStick[rn].type}！\n籤詩：${fortuneStick[rn].poem}\n\n解籤請打 /ST Fortune Solve ${fortuneStick[rn].id}`,
