@@ -10,7 +10,7 @@ module.exports = {
     MessageHandler: function (event) {
         return new Promise(async function (resolve, reject) {
             var keyword = event.message.text.match(/([\s\S]*?) -response ([\s\S]*)/i);
-            if (keyword.length != 4) reject("輸入錯誤！指令格式：<keyword> -response <response>，例如：1 2 3 -response 4-5-6");
+            if (keyword.length != 3) reject("輸入錯誤！指令格式：<keyword> -response <response>，例如：1 2 3 -response 4-5-6");
 
             // 禁止回應某些關鍵字
             DataBase.readTable("KeywordBanList").then(banList => {
