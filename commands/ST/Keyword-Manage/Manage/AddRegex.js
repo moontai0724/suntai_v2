@@ -10,7 +10,7 @@ module.exports = {
     MessageHandler: function (event) {
         return new Promise(async function (resolve, reject) {
             var keyword = event.message.text.match(/([\s\S]*?) -response ([\s\S]*)/i);
-            if (keyword.length != 3) reject("輸入錯誤！指令格式：<keyword> -response <response>，例如：1 2 3 -response 4-5-6");
+            if (keyword.length != 3 || keyword == null) reject("輸入錯誤！指令格式：<keyword> -response <response>，例如：1 2 3 -response 4-5-6");
 
             // 禁止回應某些關鍵字
             DataBase.readTable("KeywordBanList").then(banList => {
@@ -29,7 +29,7 @@ module.exports = {
                             DataBase.readTable("Keyword").then(keywordList => {
                                 if (keywordList.findIndex(element => element.keyword == encodeURIComponent(keyword[1])) == -1) {
                                     DataBase.insertValue("Keyword", [(keywordList.length == 0 ? keywordList.length : (Number(keywordList[keywordList.length - 1].id) + 1)), event.source.userId, event.source[event.source.type + "Id"], "", encodeURIComponent(keyword[1]), "Regexp", encodeURIComponent(keyword[2])]).then(() => {
-                                        resolve(MsgFormat.Text("已經設定好以下回應：\n{\n  id: " + keywordList.length + ",\n  keyword: " + keyword[1] + ",\n  dataType: Regexp,\n  data: " + keyword[3] + "\n}"));
+                                        resolve(MsgFormat.Text("已經設定好以下回應：\n{\n  id: " + keywordList.length + ",\n  keyword: " + keyword[1] + ",\n  dataType: Regexp,\n  data: " + keyword[2] + "\n}"));
                                     }, reject);
                                 }
                             }, reject);

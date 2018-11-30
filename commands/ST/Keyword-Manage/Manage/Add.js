@@ -9,7 +9,7 @@ module.exports = {
     MessageHandler: function (event) {
         return new Promise(async function (resolve, reject) {
             var keyword = event.message.text.match(/([\s\S]*?) -method (FullCompare|PartCompare|FC|PC) -response ([\s\S]*)/i);
-            if (keyword.length != 4) reject("輸入錯誤！指令格式：<keyword> -method <FullCompare(完全符合)|PartCompare(部分符合))> -response <response>，例如：1 2 3 -method FullCompare -response 4-5-6");
+            if (keyword.length != 4 || keyword == null) reject("輸入錯誤！指令格式：<keyword> -method <FullCompare(完全符合)|PartCompare(部分符合))> -response <response>，例如：1 2 3 -method FullCompare -response 4-5-6");
 
             // 禁止回應某些關鍵字
             DataBase.readTable("KeywordBanList").then(banList => {
