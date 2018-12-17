@@ -12,7 +12,7 @@ module.exports = {
                 let stickNumber = Number(event.message.text) - 1;
                 resolve({
                     type: "template",
-                    altText: `籤號：${fortuneStick[stickNumber].id}　${fortuneStick[stickNumber].type}！\n籤詩：${fortuneStick[stickNumber].poem}\n\n解籤請打 /ST Fortune Solve ${fortuneStick[rn].id}`,
+                    altText: `籤號：${fortuneStick[stickNumber].id}　${fortuneStick[stickNumber].type}！\n籤詩：${fortuneStick[stickNumber].poem}\n\n解籤請打 /ST Fortune Solve ${fortuneStick[stickNumber].id}`,
                     template: {
                         "type": "buttons",
                         "title": `籤號：${fortuneStick[stickNumber].id}　${fortuneStick[stickNumber].type}！`,
