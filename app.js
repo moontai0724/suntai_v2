@@ -91,7 +91,7 @@ router.post('/', ctx => {
 app.use(router.routes());
 
 // Service Startup
-const server = app.listen(8080);
+const server = app.listen(process.env.PORT || 8080);
 
 // Handle messages
 async function MessageHandler(event) {
