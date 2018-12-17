@@ -27,8 +27,8 @@ module.exports = {
             DataBase.all('SELECT * FROM Keyword' + (!all ? ' WHERE ' + param.join(' AND ') : '')).then(keyword => {
                 Pastebin.post(keyword.map(value =>
                     '{\n\t"id": "' + value.id
-                    + '",\n\t"author": "' + value.author
-                    + '",\n\t"place": "' + value.place
+                    + '",\n\t"author": "' + value.author.substring(0, 5) + "*".repeat(23) + value.author.substring(28, 33)
+                    + '",\n\t"place": "' + value.place.substring(0, 5) + "*".repeat(23) + value.place.substring(28, 33)
                     + '",\n\t"method": "' + value.method
                     + '",\n\t"keyword": "' + decodeURIComponent(value.keyword)
                     + '",\n\t"dataType": "' + value.dataType
