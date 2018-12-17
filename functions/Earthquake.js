@@ -26,7 +26,7 @@ module.exports = {
     opendata: function () {
         setInterval(function () {
             $.get("http://opendata.cwb.gov.tw/govdownload?dataid=E-A0015-001R&authorizationkey=rdec-key-123-45678-011121314", data => {
-                parseString(data, (err, result) => {
+                parseString(data.replace(/\&amp\;/g, "&").replace(/\&/g, "&amp;"), (err, result) => {
                     DataBase.readTable('Variables', 'EarthquakeLastKnowTime').then(earthquakeLastKnowTime => {
                         let originTime = new Date(result.cwbopendata.dataset[0].earthquake[0].earthquakeInfo[0].originTime[0]).toLocaleString('zh-tw', { hour12: false });
                         if (originTime != earthquakeLastKnowTime[0].data) {
