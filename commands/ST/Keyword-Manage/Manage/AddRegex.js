@@ -9,16 +9,17 @@ module.exports = {
     description: "新增關鍵字回應，指令格式：<keyword> -response <response>，若非正則符號請跳脫。\n請注意：預設只會在新增的地方回應。",
     MessageHandler: function (event) {
         return new Promise(async function (resolve, reject) {
-            var keyword = event.message.text.match(/([\s\S]*?) -response ([\s\S]*)/i);
+            var keyword = event.message.text.match(/([\s\S]*?) -response ([\s\S]*)/i), flag = true;
             if (keyword.length != 3 || keyword == null) reject("輸入錯誤！指令格式：<keyword> -response <response>，例如：1 2 3 -response 4-5-6");
 
             // 禁止回應某些關鍵字
             DataBase.readTable("KeywordBanList").then(banList => {
                 banList.forEach((value, index) => {
                     if ((new RegExp(decodeURIComponent(value.data))).test(keyword[3])) {
+                        flag = false;
                         reject("您的關鍵字回應中含有被禁止的關鍵字。");
                         return 0;
-                    } else if (banList.length - 1 == index) {
+                    } else if (banList.length - 1 == index && flag) {
                         try {
                             new RegExp(keyword[1]);
                         } catch (error) {
