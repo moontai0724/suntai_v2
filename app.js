@@ -134,14 +134,14 @@ async function MessageHandler(event) {
         case 'unfollow':
             break;
         case 'join':
-            DataBase.readTable(event.source.type == "group" ? "Groups" : "Rooms").then(space => {
+            DataBase.readTable(event.source.type).then(space => {
                 if (space.findIndex(value => value.id == event.source[event.source.type + "Id"]) == -1)
-                    DataBase.insertValue(event.source.type == "group" ? "Groups" : "Rooms", event.source[event.source.type + "Id"]);
-                else console.log((event.source.type == "group" ? "Groups" : "Rooms") + " " + event.source[event.source.type + "Id"] + " is already in database.");
+                    DataBase.insertValue(event.source.type, [event.source[event.source.type + "Id"], ""]);
+                else console.log(event.source.type + " " + event.source[event.source.type + "Id"] + " is already in database.");
             });
             DataBase.readTable('OwnersNotice').then(ownersNotice => {
                 for (let i = 0; i < ownersNotice.length; i++)
-                    LineBotClient.pushMessage(ownersNotice[i].id, MsgFormat.Text(UTC8Time.getTimeString() + "\n日太加入了" + event.source.type == "group" ? "群組" : "聊天室" + ": " + event.source[event.source.type + "Id"]));
+                    LineBotClient.pushMessage(ownersNotice[i].id, MsgFormat.Text(UTC8Time.getTimeString() + "\n日太加入了" + (event.source.type == "group" ? "群組" : "聊天室") + ": " + event.source[event.source.type + "Id"]));
             });
             LineBotClient.replyMessage(event.replyToken, MsgFormat.Text('您好，我是日太！在和我互動前請先詳讀以下事項：' +
                 '\n1. 由於 Developer Trial 帳號限制最大好友數為 50 人，因此請勿加入好友。' +
@@ -155,16 +155,16 @@ async function MessageHandler(event) {
                 '\nSource Code: https://github.com/moontai0724/suntaidev'));
             break;
         case 'leave':
-            DataBase.readTable(event.source.type == "group" ? "Groups" : "Rooms").then(space => {
+            DataBase.readTable(event.source.type).then(space => {
                 if (space.findIndex(value => value.id == event.source[event.source.type + "Id"]) > -1)
-                    DataBase.deleteWithId(event.source.type == "group" ? "Groups" : "Rooms", event.source[event.source.type + "Id"]);
-                else console.log((event.source.type == "group" ? "Groups" : "Rooms") + " " + event.source[event.source.type + "Id"] + " is not in database.");
+                    DataBase.deleteWithId(event.source.type, event.source[event.source.type + "Id"]);
+                else console.log(event.source.type + " " + event.source[event.source.type + "Id"] + " is not in database.");
             });
             DataBase.readTable('OwnersNotice').then(ownersNotice => {
                 for (let i = 0; i < ownersNotice.length; i++)
-                    LineBotClient.pushMessage(ownersNotice[i].id, MsgFormat.Text(new Date().toLocaleString("zh-tw") + "\n日太加入了" + event.source.type == "group" ? "群組" : "聊天室" + ": " + event.source[event.source.type + "Id"]));
+                    LineBotClient.pushMessage(ownersNotice[i].id, MsgFormat.Text(new Date().toLocaleString("zh-tw") + "\n日太離開了" + (event.source.type == "group" ? "群組" : "聊天室") + ": " + event.source[event.source.type + "Id"]));
             });
-            byreak;
+            break;
     }
 }
 

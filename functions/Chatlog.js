@@ -15,6 +15,7 @@ const sqlite = require("sqlite");
 
 // Own functions
 const UTC8Time = require(path.join(__dirname, "UTC8Time.js")); //ok.include: getNowTime(function), value
+const DataBase = require(path.jjoin(__dirname, "DaaBase.js")) = require("./DataBase.js");
 
 // Create if no such dir
 if (!fs.existsSync(path.join(process.cwd(), "ChatlogFiles"))) fs.mkdir(path.join(process.cwd(), "ChatlogFiles"), () => console.log("Spawned ChatlogFiles dir."));
@@ -33,7 +34,7 @@ module.exports = {
     log: async function (event) {
         var SourceData = {
             userId: 'UNKNOWN',
-            id: undefined,
+            id: event.source[event.source.type + "Id"],
             Profile: {
                 displayName: undefined,
                 userId: undefined,
@@ -41,18 +42,6 @@ module.exports = {
                 statusMessage: undefined
             }
         };
-
-        switch (event.source.type) {
-            case 'user':
-                SourceData.id = event.source.userId;
-                break;
-            case 'group':
-                SourceData.id = event.source.groupId;
-                break;
-            case 'room':
-                SourceData.id = event.source.roomId;
-                break;
-        }
 
         if (event.source.userId) {
             SourceData.userId = event.source.userId;
@@ -67,7 +56,20 @@ module.exports = {
                     SourceData.Profile = await LineBotClient.getRoomMemberProfile(event.source.roomId, event.source.userId); // displayName, userId, pictureUrl
                     break;
             }
+
+            // userId log (not friend)
+            DataBase.readTable("userIds").then(result => {
+                if (result.findIndex(value => value.id == SourceData.userId) == -1)
+                    DataBase.insertValue("userIds", [SourceData.userId, ""]);
+            });
         }
+
+        // groupId, roomId, userId log
+        DataBase.readTable(event.source.type).then(result => {
+            if (result.findIndex(value => value.id == SourceData.id) == -1)
+                DataBase.insertValue(event.source.type, [SourceData.id, ""]);
+        });
+
         var SaveData;
         switch (event.message.type) {
             case 'text':

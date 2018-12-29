@@ -16,15 +16,31 @@ A project of chatbot which use Developer Trial plan.
 ### Database (database/settings.sqlite) 內容
 在第一次執行的時候，會自動產生database。
 
-**Groups** -> 加入的群組
-`CREATE TABLE 'Groups' (
-    'id'	TEXT UNIQUE,
+**group** -> 加入的群組
+`CREATE TABLE 'group' (
+    'id'    TEXT UNIQUE,
+    'comment'    TEXT,
     PRIMARY KEY('id')
 );`
 
-**Rooms** -> 加入的聊天室
-`CREATE TABLE 'Rooms' (
+**room** -> 加入的聊天室
+`CREATE TABLE 'room' (
     'id'    TEXT UNIQUE,
+    'comment'    TEXT,
+    PRIMARY KEY('id')
+);`
+
+**user** -> 加入的好友
+`CREATE TABLE 'user' (
+    'id'    TEXT UNIQUE,
+    'comment'    TEXT,
+    PRIMARY KEY('id')
+);`
+
+**userIds** -> 所有記錄到的使用者
+`CREATE TABLE 'userIds' (
+    'id'    TEXT UNIQUE,
+    'comment'    TEXT,
     PRIMARY KEY('id')
 );`
 
