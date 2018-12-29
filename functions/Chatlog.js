@@ -65,9 +65,9 @@ module.exports = {
         }
 
         // groupId, roomId, userId log
-        DataBase.readTable(event.source.type).then(result => {
+        DataBase.readTable(event.source.type + "List").then(result => {
             if (result.findIndex(value => value.id == SourceData.id) == -1)
-                DataBase.insertValue(event.source.type, [SourceData.id, ""]);
+                DataBase.insertValue(event.source.type + "List", [SourceData.id, ""]);
         });
 
         var SaveData;

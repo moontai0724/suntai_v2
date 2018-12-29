@@ -134,10 +134,10 @@ async function MessageHandler(event) {
         case 'unfollow':
             break;
         case 'join':
-            DataBase.readTable(event.source.type).then(space => {
+            DataBase.readTable(event.source.type + "List").then(space => {
                 if (space.findIndex(value => value.id == event.source[event.source.type + "Id"]) == -1)
-                    DataBase.insertValue(event.source.type, [event.source[event.source.type + "Id"], ""]);
-                else console.log(event.source.type + " " + event.source[event.source.type + "Id"] + " is already in database.");
+                    DataBase.insertValue(event.source.type + "List", [event.source[event.source.type + "Id"], ""]);
+                else console.log(event.source.type + "List" + " " + event.source[event.source.type + "Id"] + " is already in database.");
             });
             DataBase.readTable('OwnersNotice').then(ownersNotice => {
                 for (let i = 0; i < ownersNotice.length; i++)
@@ -155,10 +155,10 @@ async function MessageHandler(event) {
                 '\nSource Code: https://github.com/moontai0724/suntaidev'));
             break;
         case 'leave':
-            DataBase.readTable(event.source.type).then(space => {
+            DataBase.readTable(event.source.type + "List").then(space => {
                 if (space.findIndex(value => value.id == event.source[event.source.type + "Id"]) > -1)
-                    DataBase.deleteWithId(event.source.type, event.source[event.source.type + "Id"]);
-                else console.log(event.source.type + " " + event.source[event.source.type + "Id"] + " is not in database.");
+                    DataBase.deleteWithId(event.source.type + "List", event.source[event.source.type + "Id"]);
+                else console.log(event.source.type + "List" + " " + event.source[event.source.type + "Id"] + " is not in database.");
             });
             DataBase.readTable('OwnersNotice').then(ownersNotice => {
                 for (let i = 0; i < ownersNotice.length; i++)
