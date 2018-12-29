@@ -23,15 +23,17 @@ module.exports = {
 
             DataBase.readTable('Keyword').then(keyword => {
                 keyword.forEach(value => {
-                    if (value.dataType == "text" && /F(ull)?C(ompare)?/i.test(value.method)) {
-                        if (event.message.text == decodeURIComponent(value.keyword))
-                            resolve(MsgFormat.Text(decodeURIComponent(value.data)));
-                    } else if (value.dataType == "text" && /P(art)?C(ompare)?/i.test(value.method)) {
-                        if (event.message.text.indexOf(decodeURIComponent(value.keyword)) > -1)
-                            resolve(MsgFormat.Text(decodeURIComponent(value.data)));
-                    } else if (value.dataType == "Regexp") {
-                        if (new RegExp(decodeURIComponent(value.keyword)).test(event.message.text))
-                            resolve(MsgFormat.Text(decodeURIComponent(value.data)));
+                    if (value.place == event.source[event.source.type + "Id"] || value.place == "public") {
+                        if (value.dataType == "text" && /F(ull)?C(ompare)?/i.test(value.method)) {
+                            if (event.message.text == decodeURIComponent(value.keyword))
+                                resolve(MsgFormat.Text(decodeURIComponent(value.data)));
+                        } else if (value.dataType == "text" && /P(art)?C(ompare)?/i.test(value.method)) {
+                            if (event.message.text.indexOf(decodeURIComponent(value.keyword)) > -1)
+                                resolve(MsgFormat.Text(decodeURIComponent(value.data)));
+                        } else if (value.dataType == "Regexp") {
+                            if (new RegExp(decodeURIComponent(value.keyword)).test(event.message.text))
+                                resolve(MsgFormat.Text(decodeURIComponent(value.data)));
+                        }
                     }
                 });
             });
