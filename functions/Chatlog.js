@@ -15,7 +15,7 @@ const sqlite = require("sqlite");
 
 // Own functions
 const UTC8Time = require(path.join(__dirname, "UTC8Time.js")); //ok.include: getNowTime(function), value
-const DataBase = require(path.jjoin(__dirname, "DaaBase.js")) = require("./DataBase.js");
+const DataBase = require(path.join(__dirname, "DaaBase.js")) = require("./DataBase.js");
 
 // Create if no such dir
 if (!fs.existsSync(path.join(process.cwd(), "ChatlogFiles"))) fs.mkdir(path.join(process.cwd(), "ChatlogFiles"), () => console.log("Spawned ChatlogFiles dir."));
